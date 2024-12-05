@@ -11,11 +11,19 @@ check_args() {
     do
         case $1 in
             "-h" | "--help")
-                echo -e "-h | --help    = This message"
-                exit 0
+                MODE=HELP
+            ;;
+            "-i" | "--install")
+                MODE=INSTALL
+            ;;
+            "-l" | "--list")
+                MODE=LIST
+            ;;
+            "-s" | "--search")
+                MODE=SEARCH
             ;;
             *)
-                echo -e "Unknown argument (-h for list)"
+                echo -e "Unknown argument (use -h for list)"
                 exit 1
             ;;
         esac
@@ -26,3 +34,27 @@ check_args() {
 # PROGRAM START
 
 check_args "$@"
+
+case $MODE in
+    "HELP")
+        echo -e ""
+        echo -e "  -h | --help        = This message"
+        echo -e "  -i | --install     = Install a package"
+        echo -e "  -l | --list        = List remote Packages"
+        echo -e "  -s | --search      = Search for remote Packages"
+        echo -e ""
+        exit 0
+    ;;
+    "INSTALL")
+        echo "installlol"
+    ;;
+    "LIST")
+        echo "listlol"
+    ;;
+    "SEARCH")
+        echo "search"
+    ;;
+    *)
+        echo -e "Requires an argument (use -h for list)"
+    ;;
+esac
