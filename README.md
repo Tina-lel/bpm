@@ -27,9 +27,9 @@ A fully functioning package manager for linux written in bash
 # Installation
 
 ```shell
-    git clone https://github.com/Tina-lel/bpm
-    cd bpm/
-    ./install.sh
+git clone https://github.com/Tina-lel/bpm
+cd bpm/
+ ./install.sh
 ```
 
 # Usage

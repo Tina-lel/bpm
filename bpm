@@ -8,9 +8,10 @@
 #
 # bpm is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 # without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-# PURPOSE. See the GNU General Public License for more details.
+# PURPOSE. See the GNU General Public License v2.0 for more details.
 #
-# You should have received a copy of the GNU General Public License along with bpm.
+# You should have received a copy of the
+# GNU General Public License v2.0 along with bpm.
 # If not, see <https://www.gnu.org/licenses/>.
 #
 #===============================================================================
@@ -81,7 +82,7 @@ case $MODE in
     echo -e "\tCopyright (C) 2024-present Justus0405"
     echo -e ""
     echo -e "This program may be freely redistributed under"
-    echo -e "the terms of the GNU General Public License Version 2."
+    echo -e "the terms of the GNU General Public License v2.0"
     ;;
 *)
     echo -e "Requires an argument (use -h for list)"
