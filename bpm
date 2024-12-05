@@ -3,6 +3,7 @@
 # bpm - A Bash-based System Package Manager
 # Authors: Tina-lel and Justus0405
 # License: GNU General Public License v2.0
+# Upstream: https://github.com/Tina-lel/bpm
 # Dependencies : bash, curl, tar, xz
 #
 # bpm is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
