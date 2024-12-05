@@ -1,33 +1,51 @@
 #!/bin/bash
+#===============================================================================
+# bpm - A Bash-based System Package Manager
+# Authors: Tina-lel and Justus0405
+# License: GNU General Public License v2.0
+# Dependencies : bash, curl, tar, xz
+#
+# bpm is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+# without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+# PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with bpm.
+# If not, see <https://www.gnu.org/licenses/>.
+#
+#===============================================================================
 
-# Experimental package manager written in bash - Tina_lel
-# Depends on: bash, curl, tar, xz
-# License: GPL v2
+# Global Variables
+VERSION="0.1"
 
 # FUNCTIONS
 
+# Gets all starting argument passed on start, every argument gets processed
+# and if done shifted to the left by one "$2 changes to $1 and so on" until
+# "$1" is empty
 check_args() {
-    while [[ "$1" != "" ]]
-    do
+    while [[ "$1" != "" ]]; do
         case $1 in
-            "-h" | "--help")
-                MODE=HELP
+        "-h" | "--help")
+            MODE=HELP
             ;;
-            "-i" | "--install")
-                MODE=INSTALL
+        "-i" | "--install")
+            MODE=INSTALL
             ;;
-            "-l" | "--list")
-                MODE=LIST
+        "-l" | "--list")
+            MODE=LIST
             ;;
-            "-s" | "--search")
-                MODE=SEARCH
+        "-s" | "--search")
+            MODE=SEARCH
             ;;
-            *)
-                echo -e "Unknown argument (use -h for list)"
-                exit 1
+        "-v" | "--version")
+            MODE=VERSION
+            ;;
+        *)
+            echo -e "Unknown argument (use -h for list)"
+            exit 1
             ;;
         esac
-        shift # Der kasten ist wichtig
+        shift
     done
 }
 
@@ -35,26 +53,36 @@ check_args() {
 
 check_args "$@"
 
+# Handles the modes given by the check_args function for further processing
 case $MODE in
-    "HELP")
-        echo -e ""
-        echo -e "  -h | --help        = This message"
-        echo -e "  -i | --install     = Install a package"
-        echo -e "  -l | --list        = List remote Packages"
-        echo -e "  -s | --search      = Search for remote Packages"
-        echo -e ""
-        exit 0
+"HELP")
+    echo -e ""
+    echo -e "  -h | --help        = This message"
+    echo -e "  -i | --install     = Install a package"
+    echo -e "  -l | --list        = List remote Packages"
+    echo -e "  -s | --search      = Search for remote Packages"
+    echo -e "  -v | --version     = Show current version"
+    echo -e ""
+    exit 0
     ;;
-    "INSTALL")
-        echo "installlol"
+"INSTALL")
+    echo "installlol"
     ;;
-    "LIST")
-        echo "listlol"
+"LIST")
+    echo "listlol"
     ;;
-    "SEARCH")
-        echo "search"
+"SEARCH")
+    echo "search"
     ;;
-    *)
-        echo -e "Requires an argument (use -h for list)"
+"VERSION")
+    echo -e "\tbpm v$VERSION - bash 5.2.37"
+    echo -e "\tCopyright (C) 2024-present Tina-lel"
+    echo -e "\tCopyright (C) 2024-present Justus0405"
+    echo -e ""
+    echo -e "This program may be freely redistributed under"
+    echo -e "the terms of the GNU General Public License Version 2."
+    ;;
+*)
+    echo -e "Requires an argument (use -h for list)"
     ;;
 esac
