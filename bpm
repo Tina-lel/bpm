@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Experimental package manager written in bash - Tina_lel
+# Depends on: bash, curl, tar, xz
+# License: GPL v2
+
+# FUNCTIONS
+
+check_args() {
+    while [[ "$1" != "" ]]
+    do
+        case $1 in
+            "-h" | "--help")
+                echo -e "-h | --help    = This message"
+                exit 0
+            ;;
+            *)
+                echo -e "Unknown argument (-h for list)"
+                exit 1
+            ;;
+        esac
+        shift # Der kasten ist wichtig
+    done
+}
+
+# PROGRAM START
+
+check_args "$@"
