@@ -1,0 +1,16 @@
+# Package info (Flora git)
+
+DESCRIPTION="End to end encrypted chat room"
+DEPENDENCIES=""
+DOWNLOAD="true"
+COMPILE="false"
+
+DOWNLOAD_SRC() {
+    cd $PKG_DIR/src
+    git clone https://github.com/Tina-lel/Flora
+}
+
+INSTALL_PKG() {
+    chmod +x $PKG_DIR/src/Flora/flora
+    mv $PKG_DIR/src/Flora/flora ~/Desktop/
+}
