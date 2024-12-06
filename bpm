@@ -247,10 +247,10 @@ case "$MODE" in
     ;;
 "LIST")
     echo -e "Listing of $REPO\n"
-    curl --silent $REPO/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2
+    curl --silent "$REPO"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2
     ;;
 "SEARCH")
-    curl --silent $REPO/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | grep $2
+    curl --silent "$REPO"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | grep "${PACKAGE_NAMES[0]}"
     ;;
 "VERSION")
     echo -e "\tbpm v$VERSION - bash 5.2.37"
