@@ -21,7 +21,7 @@ export VERSION="0.1"
 
 # FUNCTIONS
 
-# Creates config incase it doesnt exist
+# Creates config incase it doesnt exist and sources config file
 check_conf_dir() {
     DIRMAIN="$HOME/.config/bpm"
     if [[ ! -d "$DIRMAIN" ]]
@@ -32,6 +32,7 @@ check_conf_dir() {
         echo "" >> "$DIRMAIN/bpm.conf"
         echo "REPO=\"\"" >> "$DIRMAIN/bpm.conf"
     fi
+    source "$DIRMAIN/bpm.conf"
 }
 
 # Gets all starting argument passed on start, every argument gets processed
@@ -85,7 +86,8 @@ case $MODE in
     echo "installlol"
     ;;
 "LIST")
-    echo "listlol"
+    echo -e "Listing of $REPO\n"
+    curl --silent $REPO/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2
     ;;
 "SEARCH")
     echo "search"
