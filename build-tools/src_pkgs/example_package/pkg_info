@@ -1,0 +1,12 @@
+# Package info (Example Package v1)
+
+DESCRIPTION="Example package for BPM"
+DEPENDENCIES=""
+
+COMPILE_SRC() {
+    gcc -o $PKG_DIR/build/bpm_example -O2 $PKG_DIR/src/main.c
+}
+
+INSTALL_PKG() {
+    mv $PKG_DIR/build/bpm_example ~/Desktop/
+}
