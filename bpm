@@ -54,7 +54,8 @@ check_conf() {
 check_args() {
     # Initialize mode flags for different operations
     MODE_INSTALL=false
-    MODE_UPDATE=false
+    MODE_REMOVE=false
+    MODE_UPGRADE=false
     MODE_SEARCH=false
     PACKAGE_NAMES=() # Array to store package names (positional arguments)
 
@@ -65,15 +66,24 @@ check_args() {
             # Help flag: show usage instructions
             MODE=HELP
             ;;
+        "-v" | "--version")
+            # Version mode: used to display the program version
+            MODE=VERSION
+            ;;
         "-i" | "--install")
             # Install mode: activate the install flag
             MODE_INSTALL=true
             MODE=INSTALL
             ;;
-        "-u" | "--update")
-            # Update mode: activate the update flag
-            MODE_UPDATE=true
-            MODE=UPDATE
+        "-r" | "--remove")
+            # Remove mode: activate the remove flag
+            MODE_REMOVE=true
+            MODE=REMOVE
+            ;;
+        "-u" | "--upgrade")
+            # Upgrade mode: activate the upgrade flag
+            MODE_UPGRADE=true
+            MODE=UPGRADE
             ;;
         "-s" | "--search")
             # Search mode: activate the search flag
@@ -83,10 +93,6 @@ check_args() {
         "-l" | "--list")
             # List mode: used to list available packages
             MODE=LIST
-            ;;
-        "-v" | "--version")
-            # Version mode: used to display the program version
-            MODE=VERSION
             ;;
         -*)
             # Handle combined flags like -iu (multiple flags in one argument)
@@ -108,10 +114,15 @@ check_args() {
                         MODE_INSTALL=true
                         MODE=INSTALL
                         ;;
+                    "r")
+                        # Activate remove mode if "r" flag is found
+                        MODE_REMOVE=true
+                        MODE=REMOVE
+                        ;;
                     "u")
-                        # Activate update mode if "u" flag is found
-                        MODE_UPDATE=true
-                        MODE=UPDATE
+                        # Activate upgrade mode if "u" flag is found
+                        MODE_UPGRADE=true
+                        MODE=UPGRADE
                         ;;
                     "s")
                         # Activate search mode if "s" flag is found
@@ -149,8 +160,8 @@ check_args() {
         fi
     fi
 
-    # Ensure at least one action (install, update, search, etc.) is specified
-    if [[ "$MODE_INSTALL" == "false" && "$MODE_UPDATE" == "false" && "$MODE_SEARCH" == "false" && "$MODE" = "" ]]; then
+    # Ensure at least one action (install, remove, upgrade, etc.) is specified
+    if [[ "$MODE_INSTALL" == "false" && "$MODE_REMOVE" == "false" && "$MODE_UPGRADE" == "false" && "$MODE_SEARCH" == "false" && "$MODE" = "" ]]; then
         echo -e "${ERROR} no operation specified (use -h for help)"
         exit 1
     fi
@@ -180,6 +191,15 @@ case "$MODE" in
     echo -e "    bpm {-s --search}  [package]"
     echo -e "    bpm {-l --list}"
     echo -e ""
+    exit 0
+    ;;
+"VERSION")
+    echo -e "\tbpm v$VERSION - bash 5.2.37"
+    echo -e "\tCopyright (C) 2024-present Tina-lel"
+    echo -e "\tCopyright (C) 2024-present Justus0405"
+    echo -e ""
+    echo -e "This program may be freely redistributed under"
+    echo -e "the terms of the GNU General Public License v2.0"
     exit 0
     ;;
 "INSTALL")
@@ -242,26 +262,17 @@ case "$MODE" in
         ;;
     esac
     ;;
-"UPDATE")
-    echo -e "HELP"
+"REMOVE")
+    echo -e "OH MY GOD"
     ;;
-"LIST")
-    echo -e "Listing of $REPO\n"
-    curl --silent "$REPO"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2
+"UPGRADE")
+    echo -e "HELP"
     ;;
 "SEARCH")
     curl --silent "$REPO"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | grep "${PACKAGE_NAMES[0]}"
     ;;
-"VERSION")
-    echo -e "\tbpm v$VERSION - bash 5.2.37"
-    echo -e "\tCopyright (C) 2024-present Tina-lel"
-    echo -e "\tCopyright (C) 2024-present Justus0405"
-    echo -e ""
-    echo -e "This program may be freely redistributed under"
-    echo -e "the terms of the GNU General Public License v2.0"
-    exit 0
-    ;;
-*)
-    echo -e "Requires an argument (use -h for list)"
+"LIST")
+    echo -e "Listing of $REPO\n"
+    curl --silent "$REPO"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2
     ;;
 esac
