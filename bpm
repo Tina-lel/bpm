@@ -20,6 +20,20 @@
 # Global Variables
 export VERSION="0.1"
 
+# Color variables
+export RED="\e[1;31m"
+export GREEN="\e[1;32m"
+export YELLOW="\e[1;33m"
+export CYAN="\e[1;36m"
+export GRAY="\e[1;90m"
+export ENDCOLOR="\e[0m"
+
+# Info variables
+export SUCCSESS="${GRAY}[${GREEN}✓${GRAY}]${ENDCOLOR}"
+export ERROR="${RED}Error:${ENDCOLOR}"
+export SECTION="${GRAY}[${YELLOW}!${GRAY}]${ENDCOLOR}"
+export INFO="${GRAY}[${CYAN}i${GRAY}]${ENDCOLOR}"
+
 # FUNCTIONS
 
 # Creates config incase it doesnt exist and sources config file
@@ -37,38 +51,114 @@ check_conf() {
     source "$DIRMAIN/bpm.conf"
 }
 
-# Gets all starting argument passed on start, every argument gets processed
-# and if done shifted to the left by one "$2 changes to $1 and so on" until
-# "$1" is empty
 check_args() {
-    # TEMP FIX; until we fix the argument checker lol
-    #while [[ "$1" != "" ]]; do
-    case $1 in
-    "-h" | "--help")
-        MODE=HELP
-        ;;
-    "-i" | "--install")
-        MODE=INSTALL
-        ;;
-    "-l" | "--list")
-        MODE=LIST
-        ;;
-    "-s" | "--search")
-        MODE=SEARCH
-        ;;
-    "-v" | "--version")
-        MODE=VERSION
-        ;;
-    *)
-        echo -e "Unknown argument (use -h for list)"
+    # Initialize mode flags for different operations
+    MODE_INSTALL=false
+    MODE_UPDATE=false
+    MODE_SEARCH=false
+    PACKAGE_NAMES=() # Array to store package names (positional arguments)
+
+    # Loop through all the arguments passed to the script
+    while [[ "$1" != "" ]]; do
+        case "$1" in
+        "-h" | "--help")
+            # Help flag: show usage instructions
+            MODE=HELP
+            ;;
+        "-i" | "--install")
+            # Install mode: activate the install flag
+            MODE_INSTALL=true
+            MODE=INSTALL
+            ;;
+        "-u" | "--update")
+            # Update mode: activate the update flag
+            MODE_UPDATE=true
+            MODE=UPDATE
+            ;;
+        "-s" | "--search")
+            # Search mode: activate the search flag
+            MODE_SEARCH=true
+            MODE=SEARCH
+            ;;
+        "-l" | "--list")
+            # List mode: used to list available packages
+            MODE=LIST
+            ;;
+        "-v" | "--version")
+            # Version mode: used to display the program version
+            MODE=VERSION
+            ;;
+        -*)
+            # Handle combined flags like -iu (multiple flags in one argument)
+            #
+            # If the argument starts with a single dash and is followed by letters,
+            # treat each letter as a separate flag (e.g., -iu -> -i and -u).
+            if [[ "$1" =~ ^-([a-zA-Z]+)$ ]]; then
+                # Extract the flags by removing the leading dash
+                FLAGS="${1:1}"
+                # Iterate over each flag (character) in the combined flag
+                for FLAG in $(echo "$FLAGS" | grep -o .); do
+                    case "$FLAG" in
+                    "i")
+                        # Activate install mode if "i" flag is found
+                        MODE_INSTALL=true
+                        MODE=INSTALL
+                        ;;
+                    "u")
+                        # Activate update mode if "u" flag is found
+                        MODE_UPDATE=true
+                        MODE=UPDATE
+                        ;;
+                    "s")
+                        # Activate search mode if "s" flag is found
+                        MODE_SEARCH=true
+                        MODE=SEARCH
+                        ;;
+                    *)
+                        echo "bpm: unrecognized option '-$FLAG'"
+                        exit 1
+                        ;;
+                    esac
+                done
+            else
+                echo "bpm: unrecognized option '$1'"
+                exit 1
+            fi
+            ;;
+        *)
+            # Assume positional arguments are package names
+            #
+            # If the argument doesn't start with a dash, treat it as a package name.
+            # Append the package name to the PACKAGE_NAMES array for later use.
+            PACKAGE_NAMES+=("$1")
+            ;;
+        esac
+        shift
+    done
+
+    # Validation for conflicting modes
+    if [[ "$MODE_SEARCH" == "true" ]]; then
+        # Search mode can only be used with exactly one package
+        if [[ "${#PACKAGE_NAMES[@]}" -ne 1 ]]; then
+            echo -e "${ERROR} missing package name or more than two defined."
+            exit 1
+        fi
+    fi
+
+    # Ensure at least one action (install, update, search, etc.) is specified
+    if [[ "$MODE_INSTALL" == "false" && "$MODE_UPDATE" == "false" && "$MODE_SEARCH" == "false" && "$MODE" = "" ]]; then
+        echo -e "${ERROR} no operation specified (use -h for help)"
         exit 1
-        ;;
-    esac
-    #    shift
-    #done
+    fi
 }
 
 # PROGRAM START
+
+# A little suprise tool that will help us later :3
+#if [[ "$EUID" -ne 0 ]]; then
+#    echo "${ERROR} you cannot perform this operation unless you are root."
+#    exit 1
+#fi
 
 check_conf
 check_args "$@"
@@ -86,17 +176,17 @@ case "$MODE" in
     ;;
 "INSTALL")
     if [[ $2 == "" ]]; then
-        echo -e "Requires package name"
+        echo -e "${ERROR} no targets specified (use -h for help)"
         exit 1
     fi
 
     # This checks wether or not the specified package name is available at the
     # remote repo via an http code (200 means downloadable, so continue)
-    echo -ne "Checking Package availability... "
+    echo -ne "${INFO} Checking Package availability... "
     AVAILABILITY=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/$2.tar.gz")
     echo -e "$AVAILABILITY\n"
     if [[ "$AVAILABILITY" != "200" ]]; then
-        echo -e "Cant download package"
+        echo -e "${ERROR} Cant download package"
         exit 1
     fi
 
@@ -105,7 +195,7 @@ case "$MODE" in
     [yY][eE][sS] | [yY])
         mkdir -p "$WORKING_DIR"
         cd "$WORKING_DIR" || {
-            echo "Error: could not enter temp path"
+            echo -e "${ERROR} could not enter temp path"
             exit 1
         }
 
@@ -134,26 +224,24 @@ case "$MODE" in
 
         echo -e "# Cleaning up..."
         cd "$WORKING_DIR" || {
-            echo "Error: could not enter temp path"
+            echo -e "${ERROR} could not enter temp path"
             exit 1
         }
         rm -rf "$2.tar.gz" "$2"
         ;;
     *)
-        echo -e "Aborted."
+        echo -e "${RED}Aborted.${ENDCOLOR}"
         ;;
     esac
+    ;;
+"UPDATE")
+    echo -e "HELP"
     ;;
 "LIST")
     echo -e "Listing of $REPO\n"
     curl --silent $REPO/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2
     ;;
 "SEARCH")
-    if [[ $2 == "" ]]; then
-        echo -e "Requires package name"
-        exit 1
-    fi
-
     curl --silent $REPO/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | grep $2
     ;;
 "VERSION")
@@ -163,6 +251,7 @@ case "$MODE" in
     echo -e ""
     echo -e "This program may be freely redistributed under"
     echo -e "the terms of the GNU General Public License v2.0"
+    exit 0
     ;;
 *)
     echo -e "Requires an argument (use -h for list)"
