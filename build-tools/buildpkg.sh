@@ -2,6 +2,21 @@
 
 # Simple tool to build packages for the bpm package manager
 
+if [[ $1 == "ALL" ]]
+then
+    echo -e "Building all packages\n"
+    mkdir -p "pkgs"
+    cd "src_pkgs"
+    for i in *
+    do
+        echo -e "Building $i"
+        mkdir -p "$i/src"
+        mkdir -p "$i/build"
+        tar -czf "../pkgs/$i.tar.gz" "$i"
+    done
+    exit 0
+fi
+
 if [[ "$1" == "" ]]
 then
     echo -e "Requires name"
@@ -20,8 +35,9 @@ then
     exit 1
 fi
 
-echo -e "Creating package"
+echo -e "Building $1"
+mkdir -p "pkgs"
 mkdir -p "src_pkgs/$1/src"
 mkdir -p "src_pkgs/$1/build"
-mkdir -p "pkgs/"
-tar -czf "pkgs/$1.tar.gz" "src_pkgs/$1"
+cd "src_pkgs"
+tar -czf "../pkgs/$1.tar.gz" "$1"

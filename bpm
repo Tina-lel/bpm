@@ -14,6 +14,7 @@
 # GNU General Public License v2.0 along with bpm.
 # If not, see <https://www.gnu.org/licenses/>.
 #
+# Tina was here
 #===============================================================================
 
 # Global Variables
@@ -22,15 +23,17 @@ export VERSION="0.1"
 # FUNCTIONS
 
 # Creates config incase it doesnt exist and sources config file
-check_conf_dir() {
+check_conf() {
     DIRMAIN="$HOME/.config/bpm"
     if [[ ! -d "$DIRMAIN" ]]
     then
         mkdir -p "$DIRMAIN"
         touch "$DIRMAIN/bpm.conf"
+
         echo "# Created by bpm on $(date '+%Y\%m\%d')" >> "$DIRMAIN/bpm.conf"
         echo "" >> "$DIRMAIN/bpm.conf"
         echo "REPO=\"\"" >> "$DIRMAIN/bpm.conf"
+        echo "WORKING_DIR=\"$HOME/.cache/bpm\"" >> "$DIRMAIN/bpm.conf"
     fi
     source "$DIRMAIN/bpm.conf"
 }
@@ -39,7 +42,8 @@ check_conf_dir() {
 # and if done shifted to the left by one "$2 changes to $1 and so on" until
 # "$1" is empty
 check_args() {
-    while [[ "$1" != "" ]]; do
+    # TEMP FIX; until we fix the argument checker lol
+    #while [[ "$1" != "" ]]; do
         case $1 in
         "-h" | "--help")
             MODE=HELP
@@ -61,17 +65,17 @@ check_args() {
             exit 1
             ;;
         esac
-        shift
-    done
+    #    shift
+    #done
 }
 
 # PROGRAM START
 
-check_conf_dir
+check_conf
 check_args "$@"
 
 # Handles the modes given by the check_args function for further processing
-case $MODE in
+case "$MODE" in
 "HELP")
     echo -e ""
     echo -e "  -h | --help        = This message"
@@ -80,17 +84,77 @@ case $MODE in
     echo -e "  -s | --search      = Search for remote Packages"
     echo -e "  -v | --version     = Show current version"
     echo -e ""
-    exit 0
     ;;
 "INSTALL")
-    echo "installlol"
+    if [[ $2 == "" ]]
+    then
+        echo -e "Requires package name"
+        exit 1
+    fi
+
+    # This checks wether or not the specified package name is available at the
+    # remote repo via an http code (200 means downloadable, so continue)
+    echo -ne "Checking Package availability... "
+    AVAILABILITY=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/$2.tar.gz")
+    echo -e "$AVAILABILITY\n"
+    if [[ "$AVAILABILITY" != "200" ]]
+    then
+        echo -e "Cant download package"
+        exit 1
+    fi
+
+    read -rp "Do you wish to install $2? [Y/n] " confirm
+    case "$confirm" in
+    [yY][eE][sS]|[yY])
+        mkdir -p $WORKING_DIR
+        cd "$WORKING_DIR"
+
+        echo -e "# Downloading package..."
+        curl -s -o "$2.tar.gz" "$REPO/$2.tar.gz"
+
+        echo -e "# Extracting package..."
+        tar -xzf "$2.tar.gz"
+        PKG_DIR="$WORKING_DIR/$2"
+
+        echo -e "# Loading build info..."
+        source "$PKG_DIR/pkg_info"
+
+        if [[ "$DOWNLOAD" == "true" ]]
+        then
+            echo -e "# Downloading source..."
+            DOWNLOAD_SRC
+        fi
+
+        if [[ "$COMPILE" == "true" ]]
+        then
+            echo -e "# Compiling source..."
+            COMPILE_SRC
+        fi
+
+        echo -e "# Installing package..."
+        INSTALL_PKG
+
+        echo -e "# Cleaning up..."
+        cd "$WORKING_DIR"
+        rm -rf "$2.tar.gz" "$2"
+        ;;
+    *)
+        echo -e "Aborted."
+        ;;
+    esac
     ;;
 "LIST")
     echo -e "Listing of $REPO\n"
     curl --silent $REPO/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2
     ;;
 "SEARCH")
-    echo "search"
+    if [[ $2 == "" ]]
+    then
+        echo -e "Requires package name"
+        exit 1
+    fi
+
+    curl --silent $REPO/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | grep $2
     ;;
 "VERSION")
     echo -e "\tbpm v$VERSION - bash 5.2.37"
