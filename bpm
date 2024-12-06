@@ -99,6 +99,10 @@ check_args() {
                 # Iterate over each flag (character) in the combined flag
                 for FLAG in $(echo "$FLAGS" | grep -o .); do
                     case "$FLAG" in
+                    "h" | "v")
+                        # Show help menu when -hv or -vh is used (same behavior as pacman lol)
+                        MODE=HELP
+                        ;;
                     "i")
                         # Activate install mode if "i" flag is found
                         MODE_INSTALL=true
@@ -166,13 +170,17 @@ check_args "$@"
 # Handles the modes given by the check_args function for further processing
 case "$MODE" in
 "HELP")
+    echo -e "usage:  bpm <operation> [...]"
+    echo -e "operations:"
+    echo -e "    bpm {-h --help}"
+    echo -e "    bpm {-v --version}"
+    echo -e "    bpm {-i --install} [package(s)]"
+    echo -e "    bpm {-r --remove}  [package(s)]"
+    echo -e "    bpm {-u --upgrade} [package(s)]"
+    echo -e "    bpm {-s --search}  [package]"
+    echo -e "    bpm {-l --list}"
     echo -e ""
-    echo -e "  -h | --help        = This message"
-    echo -e "  -i | --install     = Install a package"
-    echo -e "  -l | --list        = List remote Packages"
-    echo -e "  -s | --search      = Search for remote Packages"
-    echo -e "  -v | --version     = Show current version"
-    echo -e ""
+    exit 0
     ;;
 "INSTALL")
     if [[ $2 == "" ]]; then
