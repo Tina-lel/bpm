@@ -25,15 +25,14 @@ export VERSION="0.1"
 # Creates config incase it doesnt exist and sources config file
 check_conf() {
     DIRMAIN="$HOME/.config/bpm"
-    if [[ ! -d "$DIRMAIN" ]]
-    then
+    if [[ ! -d "$DIRMAIN" ]]; then
         mkdir -p "$DIRMAIN"
         touch "$DIRMAIN/bpm.conf"
 
-        echo "# Created by bpm on $(date '+%Y\%m\%d')" >> "$DIRMAIN/bpm.conf"
-        echo "" >> "$DIRMAIN/bpm.conf"
-        echo "REPO=\"\"" >> "$DIRMAIN/bpm.conf"
-        echo "WORKING_DIR=\"$HOME/.cache/bpm\"" >> "$DIRMAIN/bpm.conf"
+        echo "# Created by bpm on $(date '+%Y\%m\%d')" >>"$DIRMAIN/bpm.conf"
+        echo "" >>"$DIRMAIN/bpm.conf"
+        echo "REPO=\"\"" >>"$DIRMAIN/bpm.conf"
+        echo "WORKING_DIR=\"$HOME/.cache/bpm\"" >>"$DIRMAIN/bpm.conf"
     fi
     source "$DIRMAIN/bpm.conf"
 }
@@ -44,27 +43,27 @@ check_conf() {
 check_args() {
     # TEMP FIX; until we fix the argument checker lol
     #while [[ "$1" != "" ]]; do
-        case $1 in
-        "-h" | "--help")
-            MODE=HELP
-            ;;
-        "-i" | "--install")
-            MODE=INSTALL
-            ;;
-        "-l" | "--list")
-            MODE=LIST
-            ;;
-        "-s" | "--search")
-            MODE=SEARCH
-            ;;
-        "-v" | "--version")
-            MODE=VERSION
-            ;;
-        *)
-            echo -e "Unknown argument (use -h for list)"
-            exit 1
-            ;;
-        esac
+    case $1 in
+    "-h" | "--help")
+        MODE=HELP
+        ;;
+    "-i" | "--install")
+        MODE=INSTALL
+        ;;
+    "-l" | "--list")
+        MODE=LIST
+        ;;
+    "-s" | "--search")
+        MODE=SEARCH
+        ;;
+    "-v" | "--version")
+        MODE=VERSION
+        ;;
+    *)
+        echo -e "Unknown argument (use -h for list)"
+        exit 1
+        ;;
+    esac
     #    shift
     #done
 }
@@ -86,8 +85,7 @@ case "$MODE" in
     echo -e ""
     ;;
 "INSTALL")
-    if [[ $2 == "" ]]
-    then
+    if [[ $2 == "" ]]; then
         echo -e "Requires package name"
         exit 1
     fi
@@ -97,17 +95,19 @@ case "$MODE" in
     echo -ne "Checking Package availability... "
     AVAILABILITY=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/$2.tar.gz")
     echo -e "$AVAILABILITY\n"
-    if [[ "$AVAILABILITY" != "200" ]]
-    then
+    if [[ "$AVAILABILITY" != "200" ]]; then
         echo -e "Cant download package"
         exit 1
     fi
 
     read -rp "Do you wish to install $2? [Y/n] " confirm
     case "$confirm" in
-    [yY][eE][sS]|[yY])
-        mkdir -p $WORKING_DIR
-        cd "$WORKING_DIR"
+    [yY][eE][sS] | [yY])
+        mkdir -p "$WORKING_DIR"
+        cd "$WORKING_DIR" || {
+            echo "Error: could not enter temp path"
+            exit 1
+        }
 
         echo -e "# Downloading package..."
         curl -s -o "$2.tar.gz" "$REPO/$2.tar.gz"
@@ -119,14 +119,12 @@ case "$MODE" in
         echo -e "# Loading build info..."
         source "$PKG_DIR/pkg_info"
 
-        if [[ "$DOWNLOAD" == "true" ]]
-        then
+        if [[ "$DOWNLOAD" == "true" ]]; then
             echo -e "# Downloading source..."
             DOWNLOAD_SRC
         fi
 
-        if [[ "$COMPILE" == "true" ]]
-        then
+        if [[ "$COMPILE" == "true" ]]; then
             echo -e "# Compiling source..."
             COMPILE_SRC
         fi
@@ -135,7 +133,10 @@ case "$MODE" in
         INSTALL_PKG
 
         echo -e "# Cleaning up..."
-        cd "$WORKING_DIR"
+        cd "$WORKING_DIR" || {
+            echo "Error: could not enter temp path"
+            exit 1
+        }
         rm -rf "$2.tar.gz" "$2"
         ;;
     *)
@@ -148,8 +149,7 @@ case "$MODE" in
     curl --silent $REPO/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2
     ;;
 "SEARCH")
-    if [[ $2 == "" ]]
-    then
+    if [[ $2 == "" ]]; then
         echo -e "Requires package name"
         exit 1
     fi
