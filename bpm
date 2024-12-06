@@ -17,9 +17,22 @@
 #===============================================================================
 
 # Global Variables
-VERSION="0.1"
+export VERSION="0.1"
 
 # FUNCTIONS
+
+# Creates config incase it doesnt exist
+check_conf_dir() {
+    DIRMAIN="$HOME/.config/bpm"
+    if [[ ! -d "$DIRMAIN" ]]
+    then
+        mkdir -p "$DIRMAIN"
+        touch "$DIRMAIN/bpm.conf"
+        echo "# Created by bpm on $(date '+%Y\%m\%d')" >> "$DIRMAIN/bpm.conf"
+        echo "" >> "$DIRMAIN/bpm.conf"
+        echo "REPO=\"\"" >> "$DIRMAIN/bpm.conf"
+    fi
+}
 
 # Gets all starting argument passed on start, every argument gets processed
 # and if done shifted to the left by one "$2 changes to $1 and so on" until
@@ -53,6 +66,7 @@ check_args() {
 
 # PROGRAM START
 
+check_conf_dir
 check_args "$@"
 
 # Handles the modes given by the check_args function for further processing
