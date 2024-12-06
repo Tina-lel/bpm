@@ -21,4 +21,7 @@ then
 fi
 
 echo -e "Creating package"
+mkdir -p "src_pkgs/$1/src"
+mkdir -p "src_pkgs/$1/build"
+mkdir -p "pkgs/"
 tar -czf "pkgs/$1.tar.gz" "src_pkgs/$1"
