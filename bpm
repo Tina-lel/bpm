@@ -100,6 +100,17 @@ add_packages() {
     local packages=("$@")
     local package_amount=${#packages[@]}
 
+    # This checks wether or not the specified package name is available at the
+    # remote repo via an http code (200 means downloadable, so continue)
+    for package in "${packages[@]}"; do
+        AVAILABILITY=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/$package.tar.gz")
+        AVAILABILITY_INFO=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/info/$package.info")
+        if [[ "$AVAILABILITY" != "200" || "$AVAILABILITY_INFO" != "200" ]]; then
+            echo -e "${ERROR} Cant download package or info"
+            exit 1
+        fi
+    done
+
     echo -e ""
     echo -e "${INFO} Packages ($package_amount): ${packages[*]}"
     echo -e ""
@@ -111,7 +122,8 @@ add_packages() {
         ;;
     *)
         for packages in "${packages[@]}"; do
-            install_package "${packages[@]}"
+            echo -e "${SECTION} Installing $packages"
+            install_package "$packages"
         done
         ;;
     esac
@@ -119,19 +131,6 @@ add_packages() {
 
 install_package() {
     local package="$1"
-
-    # This checks wether or not the specified package name is available at the
-    # remote repo via an http code (200 means downloadable, so continue)
-    echo -ne "${INFO} Checking Package availability... "
-    AVAILABILITY=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/$package.tar.gz")
-    echo -e "$AVAILABILITY"
-    echo -ne "${INFO} Checking Info availability... "
-    AVAILABILITY_INFO=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/info/$package.info")
-    echo -e "$AVAILABILITY_INFO"
-    if [[ "$AVAILABILITY" != "200" || "$AVAILABILITY_INFO" != "200" ]]; then
-        echo -e "${ERROR} Cant download package or info"
-        exit 1
-    fi
 
     mkdir -p "$WORKING_DIR"
     cd "$WORKING_DIR" || {
