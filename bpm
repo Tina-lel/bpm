@@ -121,9 +121,9 @@ add_packages() {
         exit 0
         ;;
     *)
-        for packages in "${packages[@]}"; do
-            echo -e "${SECTION} Installing $packages"
-            install_package "$packages"
+        for package_inst in "${packages[@]}"; do
+            echo -e "${SECTION} Installing $package_inst"
+            install_package "$package_inst"
         done
         ;;
     esac
