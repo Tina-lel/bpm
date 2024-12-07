@@ -20,6 +20,8 @@ if [[ $1 == "ALL" ]]; then
 
         source "$i/pkg_info"
         echo "DESCRIPTION=\"$DESCRIPTION\"" >> "../pkgs/info/$i.info"
+        echo "SIZE=\"$(du --apparent-size -hs ../pkgs/$i.tar.gz | cut -f1)\"" >> "../pkgs/info/$i.info"
+        echo "SIZE_EXTRACT=\"$(du --apparent-size -hs $i | cut -f1)\"" >> "../pkgs/info/$i.info"
         echo "DEPENDENCIES=\"$DEPENDENCIES\"" >> "../pkgs/info/$i.info"
         echo "DOWNLOAD=\"$DOWNLOAD\"" >> "../pkgs/info/$i.info"
         echo "COMPILE=\"$COMPILE\"" >> "../pkgs/info/$i.info"
@@ -60,6 +62,8 @@ echo -e "Writing $1.info"
 
 source "$1/pkg_info"
 echo "DESCRIPTION=\"$DESCRIPTION\"" >> "../pkgs/info/$1.info"
+echo "SIZE=\"$(du --apparent-size -hs ../pkgs/$1.tar.gz | cut -f1)\"" >> "../pkgs/info/$1.info"
+echo "SIZE_EXTRACT=\"$(du --apparent-size -hs $1 | cut -f1)\"" >> "../pkgs/info/$1.info"
 echo "DEPENDENCIES=\"$DEPENDENCIES\"" >> "../pkgs/info/$1.info"
 echo "DOWNLOAD=\"$DOWNLOAD\"" >> "../pkgs/info/$1.info"
 echo "COMPILE=\"$COMPILE\"" >> "../pkgs/info/$1.info"
