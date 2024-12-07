@@ -40,13 +40,15 @@ WIP
 
 ## Frontend
 
-- [ ] Tool Arguments
+- [ ] Full Tool Arguments
 - [X] File Checksums
-- [ ] Local mirrorlist
+- [ ] Local packet list
 - [ ] Parallel downloads
-- [ ] .config for various stuff
+- [ ] /etc/config for various stuff
 - [ ] x86 64bit, 32bit and arm support
+- [ ] Search by package name and description
 - [ ] Update function with new version display
+- [ ] Installed, Upgraded, Removed Packafes net size
 
 ## Backend
 
