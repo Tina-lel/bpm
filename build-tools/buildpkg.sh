@@ -46,4 +46,5 @@ cd "src_pkgs" || {
 mkdir -p "$1/src"
 mkdir -p "$1/build"
 tar -czf "../pkgs/$1.tar.gz" "$1"
-md5sum "../pkgs/$1.tar.gz" >> "../pkgs/hashes/$1.md5"
+md5=($(md5sum "../pkgs/$1.tar.gz"))
+echo "$md5  $1.tar.gz" >> "../pkgs/hashes/$1.md5"
