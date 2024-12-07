@@ -279,10 +279,10 @@ case "$MODE" in
     echo -e "HELP"
     ;;
 "SEARCH")
-    curl --silent "$REPO"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | grep "${PACKAGE_NAMES[0]}"
+    curl --silent "$REPO"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | grep -v "hashes/" | grep "${PACKAGE_NAMES[0]}"
     ;;
 "LIST")
     echo -e "Listing of $REPO\n"
-    curl --silent "$REPO"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2
+    curl --silent "$REPO"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | grep -v "hashes/"
     ;;
 esac
