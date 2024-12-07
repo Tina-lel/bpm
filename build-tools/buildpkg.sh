@@ -5,6 +5,7 @@
 if [[ $1 == "ALL" ]]; then
     echo -e "Building all packages\n"
     mkdir -p "pkgs"
+    mkdir -p "pkgs/hashes"
     cd "src_pkgs" || {
         echo "Error: could not find src_pkgs folder"
         exit 1
@@ -14,6 +15,7 @@ if [[ $1 == "ALL" ]]; then
         mkdir -p "$i/src"
         mkdir -p "$i/build"
         tar -czf "../pkgs/$i.tar.gz" "$i"
+        md5sum "../pkgs/$i.tar.gz" >> "../pkgs/hashes/$i.md5"
     done
     exit 0
 fi
@@ -35,10 +37,12 @@ fi
 
 echo -e "Building $1"
 mkdir -p "pkgs"
-mkdir -p "src_pkgs/$1/src"
-mkdir -p "src_pkgs/$1/build"
+mkdir -p "pkgs/hashes"
 cd "src_pkgs" || {
     echo "Error: could not find src_pkgs folder"
     exit 1
 }
+mkdir -p "$1/src"
+mkdir -p "$1/build"
 tar -czf "../pkgs/$1.tar.gz" "$1"
+md5sum "../pkgs/$1.tar.gz" >> "../pkgs/hashes/$1.md5"
