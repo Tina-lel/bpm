@@ -98,9 +98,22 @@ add_packages() {
     fi
 
     local packages=("$@")
-    for packages in "${packages[@]}"; do
-        install_package "${packages[@]}"
-    done
+    local package_amount=${#packages[@]}
+
+    echo -e ""
+    echo -e "${INFO} Packages ($package_amount): ${packages[*]}"
+    echo -e ""
+    read -rp "Proceed with installation? [Y/n] " confirm
+    case "$confirm" in
+    [yY][eE][sS] | [yY])
+        for packages in "${packages[@]}"; do
+            install_package "${packages[@]}"
+        done
+    ;;
+    *)
+        echo -e "${RED}Aborted.${ENDCOLOR}"
+        ;;
+    esac
 }
 
 install_package() {
@@ -119,11 +132,6 @@ install_package() {
         exit 1
     fi
 
-    echo -e ""
-
-    read -rp "Do you wish to install $package? [Y/n] " confirm
-    case "$confirm" in
-    [yY][eE][sS] | [yY])
         mkdir -p "$WORKING_DIR"
         cd "$WORKING_DIR" || {
             echo -e "${ERROR} could not enter temp path"
@@ -166,11 +174,6 @@ install_package() {
             exit 1
         }
         rm -rf "$package.tar.gz" "$package.info" "$package"
-        ;;
-    *)
-        echo -e "${RED}Aborted.${ENDCOLOR}"
-        ;;
-    esac
 }
 
 search_package() {
