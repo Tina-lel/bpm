@@ -111,8 +111,9 @@ search_package() {
         echo -e "${ERROR} no package specified."
         exit 1
     fi
-    echo -e "${INFO} Searching for $1"
-    curl --silent "$REPO"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | grep -v "hashes/" | grep "$1"
+    local package="$1"
+    echo -e "${INFO} Searching for $package"
+    curl --silent "$REPO"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | grep -v "hashes/" | grep "$package"
 }
 
 info_mirrorlist() {
