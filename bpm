@@ -230,42 +230,42 @@ case "$MODE" in
             exit 1
         }
 
-        echo -e "# Downloading package..."
+        echo -e "${INFO} Downloading package..."
         curl -s -o "$2.tar.gz" "$REPO/$2.tar.gz"
         curl -s -o "$2.md5" "$REPO/hashes/$2.md5"
 
-        echo -e "# Verifying checksum..."
+        echo -e "${INFO} Verifying checksum..."
         md5sum -c "$2.md5" || {
             echo -e "${ERROR} Checksum missmatch"
             exit 1
         }
 
-        echo -e "# Extracting package..."
+        echo -e "${INFO} Extracting package..."
         tar -xzf "$2.tar.gz"
         PKG_DIR="$WORKING_DIR/$2"
 
-        echo -e "# Loading build info..."
+        echo -e "${INFO} Loading build info..."
         source "$PKG_DIR/pkg_info"
 
         if [[ "$DOWNLOAD" == "true" ]]; then
-            echo -e "# Downloading source..."
+            echo -e "${INFO} Downloading source..."
             DOWNLOAD_SRC
         fi
 
         if [[ "$COMPILE" == "true" ]]; then
-            echo -e "# Compiling source..."
+            echo -e "${INFO} Compiling source..."
             COMPILE_SRC
         fi
 
-        echo -e "# Installing package..."
+        echo -e "${INFO} Installing package..."
         INSTALL_PKG
 
-        echo -e "# Cleaning up..."
+        echo -e "${INFO} Cleaning up..."
         cd "$WORKING_DIR" || {
             echo -e "${ERROR} could not enter temp path"
             exit 1
         }
-        rm -rf "$2.tar.gz" "$2"
+        rm -rf "$2.tar.gz" "$2.md5" "$2"
         ;;
     *)
         echo -e "${RED}Aborted.${ENDCOLOR}"
