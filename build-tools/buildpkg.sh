@@ -15,7 +15,8 @@ if [[ $1 == "ALL" ]]; then
         mkdir -p "$i/src"
         mkdir -p "$i/build"
         tar -czf "../pkgs/$i.tar.gz" "$i"
-        md5sum "../pkgs/$i.tar.gz" >> "../pkgs/hashes/$i.md5"
+        md5=($(md5sum "../pkgs/$i.tar.gz"))
+        echo "$md5  $i.tar.gz" >> "../pkgs/hashes/$i.md5"
     done
     exit 0
 fi

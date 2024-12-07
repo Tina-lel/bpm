@@ -212,9 +212,12 @@ case "$MODE" in
     # remote repo via an http code (200 means downloadable, so continue)
     echo -ne "${INFO} Checking Package availability... "
     AVAILABILITY=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/$2.tar.gz")
-    echo -e "$AVAILABILITY\n"
-    if [[ "$AVAILABILITY" != "200" ]]; then
-        echo -e "${ERROR} Cant download package"
+    echo -e "$AVAILABILITY"
+    echo -ne "${INFO} Checking Checksum availability... "
+    AVAILABILITY_MD5=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/hashes/$2.md5")
+    echo -e "$AVAILABILITY_MD5"
+    if [[ "$AVAILABILITY" != "200" || "$AVAILABILITY_MD5" != "200" ]]; then
+        echo -e "${ERROR} Cant download package or checksum"
         exit 1
     fi
 
@@ -229,6 +232,13 @@ case "$MODE" in
 
         echo -e "# Downloading package..."
         curl -s -o "$2.tar.gz" "$REPO/$2.tar.gz"
+        curl -s -o "$2.md5" "$REPO/hashes/$2.md5"
+
+        echo -e "# Verifying checksum..."
+        md5sum -c "$2.md5" || {
+            echo -e "${ERROR} Checksum missmatch"
+            exit 1
+        }
 
         echo -e "# Extracting package..."
         tar -xzf "$2.tar.gz"
