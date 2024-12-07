@@ -105,14 +105,14 @@ add_packages() {
     echo -e ""
     read -rp "Proceed with installation? [Y/n] " confirm
     case "$confirm" in
-    [yY][eE][sS] | [yY])
+    [nN])
+        echo -e "${RED}Aborted.${ENDCOLOR}"
+        exit 0
+        ;;
+    *)
         for packages in "${packages[@]}"; do
             install_package "${packages[@]}"
         done
-    ;;
-    *)
-        echo -e "${RED}Aborted.${ENDCOLOR}"
-        exit 0
         ;;
     esac
 }
@@ -133,48 +133,48 @@ install_package() {
         exit 1
     fi
 
-        mkdir -p "$WORKING_DIR"
-        cd "$WORKING_DIR" || {
-            echo -e "${ERROR} could not enter temp path"
-            exit 1
-        }
+    mkdir -p "$WORKING_DIR"
+    cd "$WORKING_DIR" || {
+        echo -e "${ERROR} could not enter temp path"
+        exit 1
+    }
 
-        echo -e "${INFO} Downloading package..."
-        curl -s -o "$package.tar.gz" "$REPO/$package.tar.gz"
-        curl -s -o "$package.info" "$REPO/info/$package.info"
+    echo -e "${INFO} Downloading package..."
+    curl -s -o "$package.tar.gz" "$REPO/$package.tar.gz"
+    curl -s -o "$package.info" "$REPO/info/$package.info"
 
-        echo -e "${INFO} Verifying checksum..."
-        cat "$package.info" | tail -n 1 | md5sum -c - || {
-            echo -e "${ERROR} Checksum missmatch"
-            exit 1
-        }
+    echo -e "${INFO} Verifying checksum..."
+    cat "$package.info" | tail -n 1 | md5sum -c - || {
+        echo -e "${ERROR} Checksum missmatch"
+        exit 1
+    }
 
-        echo -e "${INFO} Extracting package..."
-        tar -xzf "$package.tar.gz"
-        PKG_DIR="$WORKING_DIR/$package"
+    echo -e "${INFO} Extracting package..."
+    tar -xzf "$package.tar.gz"
+    PKG_DIR="$WORKING_DIR/$package"
 
-        echo -e "${INFO} Loading build info..."
-        source "$PKG_DIR/pkg_info"
+    echo -e "${INFO} Loading build info..."
+    source "$PKG_DIR/pkg_info"
 
-        if [[ "$DOWNLOAD" == "true" ]]; then
-            echo -e "${INFO} Downloading source..."
-            DOWNLOAD_SRC
-        fi
+    if [[ "$DOWNLOAD" == "true" ]]; then
+        echo -e "${INFO} Downloading source..."
+        DOWNLOAD_SRC
+    fi
 
-        if [[ "$COMPILE" == "true" ]]; then
-            echo -e "${INFO} Compiling source..."
-            COMPILE_SRC
-        fi
+    if [[ "$COMPILE" == "true" ]]; then
+        echo -e "${INFO} Compiling source..."
+        COMPILE_SRC
+    fi
 
-        echo -e "${INFO} Installing package..."
-        INSTALL_PKG
+    echo -e "${INFO} Installing package..."
+    INSTALL_PKG
 
-        echo -e "${INFO} Cleaning up..."
-        cd "$WORKING_DIR" || {
-            echo -e "${ERROR} could not enter temp path"
-            exit 1
-        }
-        rm -rf "$package.tar.gz" "$package.info" "$package"
+    echo -e "${INFO} Cleaning up..."
+    cd "$WORKING_DIR" || {
+        echo -e "${ERROR} could not enter temp path"
+        exit 1
+    }
+    rm -rf "$package.tar.gz" "$package.info" "$package"
 }
 
 search_package() {
@@ -221,4 +221,3 @@ version_message() {
 
 check_conf
 check_args "$@"
-
