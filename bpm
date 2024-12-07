@@ -92,6 +92,11 @@ check_args() {
 }
 
 add_packages() {
+    if [[ $1 == "" ]]; then
+        echo -e "${ERROR} no targets specified."
+        exit 1
+    fi
+
     local packages=("$@")
     for packages in "${packages[@]}"; do
         install_package "${packages[@]}"
@@ -100,11 +105,6 @@ add_packages() {
 
 install_package() {
     local package="$1"
-
-    if [[ $package == "" ]]; then
-        echo -e "${ERROR} no targets specified (use -h for help)"
-        exit 1
-    fi
 
     # This checks wether or not the specified package name is available at the
     # remote repo via an http code (200 means downloadable, so continue)
