@@ -34,7 +34,20 @@ cd bpm/
 
 # Usage
 
-WIP
+```shell
+sage:  bpm <operation> [...]
+operations:
+    bpm add     [package(s)]
+    bpm del     [package(s)]
+    bpm search  [package]
+    bpm info    [package]
+    bpm list
+    bpm update
+    bpm upgrade
+    bpm help
+    bpm version
+
+```
 
 # Todo
 
@@ -42,13 +55,13 @@ WIP
 
 - [ ] Full Tool Arguments
 - [X] File Checksums
-- [ ] Local packet list
+- [ ] Local packages list
 - [ ] Parallel downloads
 - [ ] /etc/config for various stuff
 - [ ] x86 64bit, 32bit and arm support
 - [ ] Search by package name and description
 - [ ] Update function with new version display
-- [ ] Installed, Upgraded, Removed Packafes net size
+- [ ] Installed, Upgraded, Removed Packages net size
 
 ## Backend
 
