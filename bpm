@@ -66,11 +66,9 @@ check_args() {
         search_package "$1"
         ;;
     "update")
-        shift
         update_mirrorlist
         ;;
     "upgrade")
-        shift
         upgrade_package
         ;;
     "info")
