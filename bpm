@@ -108,8 +108,8 @@ install_package() {
 
 search_package() {
     if [[ $1 == "" ]]; then
-    echo -e "${ERROR} no package specified."
-    exit 1
+        echo -e "${ERROR} no package specified."
+        exit 1
     fi
     echo -e "${INFO} Searching for $1"
     curl --silent "$REPO"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | grep -v "hashes/" | grep "$1"
