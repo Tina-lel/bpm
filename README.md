@@ -41,7 +41,7 @@ WIP
 ## Frontend
 
 - [ ] Tool Arguments
-- [ ] File Checksums
+- [X] File Checksums
 - [ ] Local mirrorlist
 - [ ] Parallel downloads
 - [ ] .config for various stuff
@@ -50,4 +50,4 @@ WIP
 
 ## Backend
 
-- [ ] Package builder script with checksum generation
+- [X] Package builder script with checksum generation
