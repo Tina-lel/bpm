@@ -17,6 +17,8 @@
 # Tina was here
 #===============================================================================
 
+set -e
+
 # Global Variables
 export VERSION="0.1"
 
@@ -221,6 +223,8 @@ case "$MODE" in
         exit 1
     fi
 
+    echo -e ""
+
     read -rp "Do you wish to install $2? [Y/n] " confirm
     case "$confirm" in
     [yY][eE][sS] | [yY])
@@ -235,7 +239,7 @@ case "$MODE" in
         curl -s -o "$2.md5" "$REPO/hashes/$2.md5"
 
         echo -e "${INFO} Verifying checksum..."
-        md5sum -c "$2.md5" || {
+        md5sum --quiet -c "$2.md5" || {
             echo -e "${ERROR} Checksum missmatch"
             exit 1
         }
