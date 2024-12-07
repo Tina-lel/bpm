@@ -100,8 +100,6 @@ add_packages() {
 
 install_package() {
     local package="$1"
-    echo -e "${INFO} installing $1"
-    # Hier installation function sobald tina mir es erklärt hat
 
     if [[ $package == "" ]]; then
         echo -e "${ERROR} no targets specified (use -h for help)"
