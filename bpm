@@ -65,14 +65,18 @@ check_args() {
         shift
         search_package "$1"
         ;;
+    "info")
+        shift
+        info_package "$1"
+        ;;
     "update")
-        update_mirrorlist
+        update_packagelist
         ;;
     "upgrade")
         upgrade_package
         ;;
-    "info")
-        info_mirrorlist
+    "list")
+        info_packagelist
         ;;
     "help")
         help_message
@@ -186,7 +190,23 @@ search_package() {
     curl --silent "$REPO"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | grep -v "info/" | grep "$package"
 }
 
-info_mirrorlist() {
+info_package() {
+    if [[ $1 == "" ]]; then
+        echo -e "${ERROR} no package specified."
+        exit 1
+    fi
+    local package="$1"
+
+    AVAILABILITY_INFO=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/info/$package.info")
+    if [[ "$AVAILABILITY_INFO" != "200" ]]; then
+        echo -e "${ERROR} Cant download info"
+        exit 1
+    fi
+    echo -e "${INFO} Info for $package"
+    curl --silent "$REPO/info/$package.info"
+}
+
+info_packagelist() {
     echo -e "${INFO} Listing of $REPO\n"
     curl --silent "$REPO"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | grep -v "info/"
 }
@@ -197,7 +217,8 @@ help_message() {
     echo -e "    bpm add     [package(s)]"
     echo -e "    bpm del     [package(s)]"
     echo -e "    bpm search  [package]"
-    echo -e "    bpm info"
+    echo -e "    bpm info    [package]"
+    echo -e "    bpm list"
     echo -e "    bpm update"
     echo -e "    bpm upgrade"
     echo -e "    bpm help"
