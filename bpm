@@ -144,7 +144,7 @@ install_package() {
     curl -s -o "$package.info" "$REPO/info/$package.info"
 
     echo -e "${INFO} Verifying checksum..."
-    cat "$package.info" | tail -n 1 | md5sum -c - || {
+    cat "$package.info" | tail -n 1 | md5sum --quiet -c - || {
         echo -e "${ERROR} Checksum missmatch"
         exit 1
     }
@@ -169,7 +169,7 @@ install_package() {
     echo -e "${INFO} Installing package..."
     INSTALL_PKG
 
-    echo -e "${INFO} Cleaning up..."
+    echo -e "${INFO} Cleaning up...\n"
     cd "$WORKING_DIR" || {
         echo -e "${ERROR} could not enter temp path"
         exit 1
