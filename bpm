@@ -112,6 +112,7 @@ add_packages() {
     ;;
     *)
         echo -e "${RED}Aborted.${ENDCOLOR}"
+        exit 0
         ;;
     esac
 }
