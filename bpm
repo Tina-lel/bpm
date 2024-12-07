@@ -102,58 +102,8 @@ install_package() {
     local package="$1"
     echo -e "${INFO} installing $1"
     # Hier installation function sobald tina mir es erklärt hat
-}
 
-search_package() {
-    if [[ $1 == "" ]]; then
-        echo -e "${ERROR} no package specified."
-        exit 1
-    fi
-    local package="$1"
-    echo -e "${INFO} Searching for $package"
-    curl --silent "$REPO"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | grep -v "hashes/" | grep "$package"
-}
-
-info_mirrorlist() {
-    echo -e "${INFO} Listing of $REPO\n"
-    curl --silent "$REPO"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | grep -v "hashes/"
-}
-
-help_message() {
-    echo -e "usage:  bpm <operation> [...]"
-    echo -e "operations:"
-    echo -e "    bpm add     [package(s)]"
-    echo -e "    bpm del     [package(s)]"
-    echo -e "    bpm search  [package]"
-    echo -e "    bpm info"
-    echo -e "    bpm update"
-    echo -e "    bpm upgrade"
-    echo -e "    bpm help"
-    echo -e "    bpm version"
-    echo -e ""
-    exit 0
-    exit 0
-}
-
-version_message() {
-    echo -e "\tbpm v$VERSION - bash 5.2.37"
-    echo -e "\tCopyright (C) 2024-present Tina-lel"
-    echo -e "\tCopyright (C) 2024-present Justus0405"
-    echo -e ""
-    echo -e "This program may be freely redistributed under"
-    echo -e "the terms of the GNU General Public License v2.0"
-    exit 0
-}
-
-# PROGRAM START
-
-check_conf
-check_args "$@"
-
-# Handles the modes given by the check_args function for further processing
-case "$MODE" in
-"INSTALL")
-    if [[ $2 == "" ]]; then
+    if [[ $package == "" ]]; then
         echo -e "${ERROR} no targets specified (use -h for help)"
         exit 1
     fi
@@ -161,19 +111,19 @@ case "$MODE" in
     # This checks wether or not the specified package name is available at the
     # remote repo via an http code (200 means downloadable, so continue)
     echo -ne "${INFO} Checking Package availability... "
-    AVAILABILITY=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/$2.tar.gz")
+    AVAILABILITY=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/$package.tar.gz")
     echo -e "$AVAILABILITY"
-    echo -ne "${INFO} Checking Checksum availability... "
-    AVAILABILITY_MD5=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/hashes/$2.md5")
-    echo -e "$AVAILABILITY_MD5"
-    if [[ "$AVAILABILITY" != "200" || "$AVAILABILITY_MD5" != "200" ]]; then
-        echo -e "${ERROR} Cant download package or checksum"
+    echo -ne "${INFO} Checking Info availability... "
+    AVAILABILITY_INFO=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/info/$package.info")
+    echo -e "$AVAILABILITY_INFO"
+    if [[ "$AVAILABILITY" != "200" || "$AVAILABILITY_INFO" != "200" ]]; then
+        echo -e "${ERROR} Cant download package or info"
         exit 1
     fi
 
     echo -e ""
 
-    read -rp "Do you wish to install $2? [Y/n] " confirm
+    read -rp "Do you wish to install $package? [Y/n] " confirm
     case "$confirm" in
     [yY][eE][sS] | [yY])
         mkdir -p "$WORKING_DIR"
@@ -183,18 +133,18 @@ case "$MODE" in
         }
 
         echo -e "${INFO} Downloading package..."
-        curl -s -o "$2.tar.gz" "$REPO/$2.tar.gz"
-        curl -s -o "$2.md5" "$REPO/hashes/$2.md5"
+        curl -s -o "$package.tar.gz" "$REPO/$package.tar.gz"
+        curl -s -o "$package.info" "$REPO/info/$package.info"
 
         echo -e "${INFO} Verifying checksum..."
-        md5sum --quiet -c "$2.md5" || {
+        cat "$package.info" | tail -n 1 | md5sum -c - || {
             echo -e "${ERROR} Checksum missmatch"
             exit 1
         }
 
         echo -e "${INFO} Extracting package..."
-        tar -xzf "$2.tar.gz"
-        PKG_DIR="$WORKING_DIR/$2"
+        tar -xzf "$package.tar.gz"
+        PKG_DIR="$WORKING_DIR/$package"
 
         echo -e "${INFO} Loading build info..."
         source "$PKG_DIR/pkg_info"
@@ -217,11 +167,56 @@ case "$MODE" in
             echo -e "${ERROR} could not enter temp path"
             exit 1
         }
-        rm -rf "$2.tar.gz" "$2.md5" "$2"
+        rm -rf "$package.tar.gz" "$package.info" "$package"
         ;;
     *)
         echo -e "${RED}Aborted.${ENDCOLOR}"
         ;;
     esac
-    ;;
-esac
+}
+
+search_package() {
+    if [[ $1 == "" ]]; then
+        echo -e "${ERROR} no package specified."
+        exit 1
+    fi
+    local package="$1"
+    echo -e "${INFO} Searching for $package"
+    curl --silent "$REPO"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | grep -v "info/" | grep "$package"
+}
+
+info_mirrorlist() {
+    echo -e "${INFO} Listing of $REPO\n"
+    curl --silent "$REPO"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | grep -v "info/"
+}
+
+help_message() {
+    echo -e "usage:  bpm <operation> [...]"
+    echo -e "operations:"
+    echo -e "    bpm add     [package(s)]"
+    echo -e "    bpm del     [package(s)]"
+    echo -e "    bpm search  [package]"
+    echo -e "    bpm info"
+    echo -e "    bpm update"
+    echo -e "    bpm upgrade"
+    echo -e "    bpm help"
+    echo -e "    bpm version"
+    echo -e ""
+    exit 0
+}
+
+version_message() {
+    echo -e "\tbpm v$VERSION - bash 5.2.37"
+    echo -e "\tCopyright (C) 2024-present Tina-lel"
+    echo -e "\tCopyright (C) 2024-present Justus0405"
+    echo -e ""
+    echo -e "This program may be freely redistributed under"
+    echo -e "the terms of the GNU General Public License v2.0"
+    exit 0
+}
+
+# PROGRAM START
+
+check_conf
+check_args "$@"
+
