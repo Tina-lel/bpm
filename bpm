@@ -106,11 +106,11 @@ add_packages() {
 
     # This checks wether or not the specified package name is available at the
     # remote repo via an http code (200 means downloadable, so continue)
-    for package in "${packages[@]}"; do
-        AVAILABILITY=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/$package.tar.gz")
-        AVAILABILITY_INFO=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/info/$package.info")
+    for package_check in "${packages[@]}"; do
+        AVAILABILITY=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/$package_check.tar.gz")
+        AVAILABILITY_INFO=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/info/$package_check.info")
         if [[ "$AVAILABILITY" != "200" || "$AVAILABILITY_INFO" != "200" ]]; then
-            echo -e "${ERROR} Cant download package or info"
+            echo -e "${ERROR} Cant download package or info for '$package_check'"
             exit 1
         fi
     done
@@ -228,12 +228,14 @@ help_message() {
 }
 
 version_message() {
-    echo -e "\tbpm v$VERSION - bash 5.2.37"
-    echo -e "\tCopyright (C) 2024-present Tina-lel"
-    echo -e "\tCopyright (C) 2024-present Justus0405"
     echo -e ""
-    echo -e "This program may be freely redistributed under"
-    echo -e "the terms of the GNU General Public License v2.0"
+    echo -e "───▄▄▄         bpm v$VERSION - bash 5.2.37"
+    echo -e "─▄▀░▄░▀▄       Copyright (C) 2024-present Tina-lel"
+    echo -e "─█░█▄▀░█       Copyright (C) 2024-present Justus0405"
+    echo -e "─█░▀▄▄▀█▄█▄▀"
+    echo -e "▄▄█▄▄▄▄███▀    This program may be freely redistributed under"
+    echo -e "               the terms of the GNU General Public License v2.0"
+    echo -e ""
     exit 0
 }
 
