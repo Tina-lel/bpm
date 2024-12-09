@@ -141,9 +141,10 @@ install_package() {
         exit 1
     }
 
-    echo -e "${INFO} Downloading package..."
-    curl -s -o "$package.tar.gz" "$REPO/$package.tar.gz"
+    echo -e "${INFO} Downloading package"
     curl -s -o "$package.info" "$REPO/info/$package.info"
+    source "$package.info" > /dev/null 2>&1
+    curl -s -o "$package.tar.gz" "$REPO/$SORT/$package.tar.gz"
 
     echo -e "${INFO} Verifying checksum..."
     cat "$package.info" | tail -n 1 | md5sum --quiet -c - || {
@@ -186,7 +187,7 @@ search_package() {
     fi
     local package="$1"
     echo -e "${INFO} Searching for $package"
-    curl --silent "$REPO"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | grep -v "info/" | grep "$package"
+    curl --silent "$REPO/info"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | grep "$package"
 }
 
 info_package() {
@@ -207,7 +208,7 @@ info_package() {
 
 info_packagelist() {
     echo -e "${INFO} Listing of $REPO\n"
-    curl --silent "$REPO"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | grep -v "info/"
+    curl --silent "$REPO/info"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2
 }
 
 help_message() {
