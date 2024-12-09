@@ -141,7 +141,7 @@ install_package() {
         exit 1
     }
 
-    echo -e "${INFO} Downloading package"
+    echo -e "${INFO} Downloading package..."
     curl -s -o "$package.info" "$REPO/info/$package.info"
     source "$package.info" > /dev/null 2>&1
     curl -s -o "$package.tar.gz" "$REPO/$SORT/$package.tar.gz"
