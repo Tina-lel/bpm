@@ -16,7 +16,7 @@
     <a href="https://github.com/Tina-lel/bpm/blob/main/bpm"><img src="https://img.shields.io/badge/Version-0.1-blue?colorA=1e1e2e&colorB=cdd6f4&style=for-the-badge"></a>
 </p>
 
-A fully functioning package manager for linux written in bash
+A ~fully functioning~ package manager for linux written in bash
 
 # Information
 
