@@ -1,6 +1,8 @@
 # Package info (Example Package v1)
-
 DESCRIPTION="Example package for BPM"
+
+REPO="main"
+
 DEPENDENCIES=""
 DOWNLOAD="false"
 COMPILE="true"

@@ -1,6 +1,8 @@
 # Package info (Flora git)
-
 DESCRIPTION="End to end encrypted chat room"
+
+REPO="extra"
+
 DEPENDENCIES=""
 DOWNLOAD="true"
 COMPILE="false"
