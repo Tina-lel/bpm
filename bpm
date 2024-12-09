@@ -182,7 +182,7 @@ install_package() {
         echo -e "${ERROR} could not enter temp path"
         exit 1
     }
-    rm -rf "$package.tar.gz" "$package"
+    rm -rf "$package.tar.gz" "$package.info" "$package"
 }
 
 search_package() {
