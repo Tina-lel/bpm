@@ -1,7 +1,7 @@
 # Package info (Example Package v1)
 DESCRIPTION="Example package for BPM"
 
-REPO="main"
+SORT="main"
 
 DEPENDENCIES=""
 DOWNLOAD="false"

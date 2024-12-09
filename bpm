@@ -107,10 +107,9 @@ add_packages() {
     # This checks wether or not the specified package name is available at the
     # remote repo via an http code (200 means downloadable, so continue)
     for package_check in "${packages[@]}"; do
-        AVAILABILITY=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/$package_check.tar.gz")
-        AVAILABILITY_INFO=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/info/$package_check.info")
-        if [[ "$AVAILABILITY" != "200" || "$AVAILABILITY_INFO" != "200" ]]; then
-            echo -e "${ERROR} Cant download package or info for '$package_check'"
+        AVAILABILITY=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/info/$package_check.info")
+        if [[ "$AVAILABILITY" != "200" ]]; then
+            echo -e "${ERROR} Cant download package info for '$package_check'"
             exit 1
         fi
     done
