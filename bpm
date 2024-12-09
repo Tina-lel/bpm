@@ -187,7 +187,7 @@ search_package() {
     fi
     local package="$1"
     echo -e "${INFO} Searching for $package"
-    curl --silent "$REPO/info"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | grep "$package"
+    curl --silent "$REPO/info"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | cut -d '.' -f1 | grep "$package"
 }
 
 info_package() {
@@ -208,7 +208,7 @@ info_package() {
 
 info_packagelist() {
     echo -e "${INFO} Listing of $REPO\n"
-    curl --silent "$REPO/info"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2
+    curl --silent "$REPO/info"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | cut -d '.' -f1
 }
 
 help_message() {
