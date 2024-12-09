@@ -146,7 +146,7 @@ install_package() {
 
     echo -e "${INFO} Downloading package..."
     curl -s -o "$package.info" "$REPO/info/$package.info"
-    source "$package.info" > /dev/null 2>&1
+    source "$package.info" >/dev/null 2>&1
     curl -s -o "$package.tar.gz" "$REPO/$SORT/$package.tar.gz"
 
     echo -e "${INFO} Verifying checksum..."
@@ -175,7 +175,7 @@ install_package() {
 
     echo -e "${INFO} Installing package..."
     INSTALL_PKG
-    echo "INSTALLED_FILES=(${INSTALLED_FILES[@]})" >> "$DIRMAIN/index/$package"
+    echo "INSTALLED_FILES=(${INSTALLED_FILES[*]})" >>"$DIRMAIN/index/$package"
 
     echo -e "${INFO} Cleaning up...\n"
     cd "$WORKING_DIR" || {
