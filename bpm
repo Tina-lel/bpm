@@ -41,6 +41,7 @@ check_conf() {
     DIRMAIN="$HOME/.config/bpm"
     if [[ ! -d "$DIRMAIN" ]]; then
         mkdir -p "$DIRMAIN"
+        mkdir -p "$DIRMAIN/index"
         touch "$DIRMAIN/bpm.conf"
 
         echo "# Created by bpm on $(date '+%Y\%m\%d')" >>"$DIRMAIN/bpm.conf"
@@ -99,6 +100,8 @@ add_packages() {
     if [[ $1 == "" ]]; then
         echo -e "${ERROR} no targets specified."
         exit 1
+    elif [[ -f "$DIRMAIN/index/$1" ]]; then
+        echo -e "${SECTION} package already installed, reinstalling..."
     fi
 
     local packages=("$@")
@@ -158,6 +161,7 @@ install_package() {
 
     echo -e "${INFO} Loading build info..."
     source "$PKG_DIR/pkg_info"
+    set -e
 
     if [[ "$DOWNLOAD" == "true" ]]; then
         echo -e "${INFO} Downloading source..."
@@ -171,13 +175,14 @@ install_package() {
 
     echo -e "${INFO} Installing package..."
     INSTALL_PKG
+    echo "INSTALLED_FILES=(${INSTALLED_FILES[@]})" >> "$DIRMAIN/index/$package"
 
     echo -e "${INFO} Cleaning up...\n"
     cd "$WORKING_DIR" || {
         echo -e "${ERROR} could not enter temp path"
         exit 1
     }
-    rm -rf "$package.tar.gz" "$package.info" "$package"
+    rm -rf "$package.tar.gz" "$package"
 }
 
 search_package() {

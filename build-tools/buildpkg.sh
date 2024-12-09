@@ -30,6 +30,7 @@ case "$1" in
         echo "DEPENDENCIES=\"$DEPENDENCIES\"" >> "../pkgs/info/$i.info"
         echo "DOWNLOAD=\"$DOWNLOAD\"" >> "../pkgs/info/$i.info"
         echo "COMPILE=\"$COMPILE\"" >> "../pkgs/info/$i.info"
+        echo "INSTALLED_FILES=(${INSTALLED_FILES[@]})" >> "../pkgs/info/$i.info"
 
         md5=($(md5sum "../pkgs/$SORT/$i.tar.gz"))
         echo "$md5  $i.tar.gz" >> "../pkgs/info/$i.info"
@@ -82,6 +83,7 @@ echo "SIZE_EXTRACT=\"$(du --apparent-size -hs $1 | cut -f1)\"" >> "../pkgs/info/
 echo "DEPENDENCIES=\"$DEPENDENCIES\"" >> "../pkgs/info/$1.info"
 echo "DOWNLOAD=\"$DOWNLOAD\"" >> "../pkgs/info/$1.info"
 echo "COMPILE=\"$COMPILE\"" >> "../pkgs/info/$1.info"
+echo "INSTALLED_FILES=(${INSTALLED_FILES[@]})" >> "../pkgs/info/$1.info"
 
 md5=($(md5sum "../pkgs/$SORT/$1.tar.gz"))
 echo "$md5  $1.tar.gz" >> "../pkgs/info/$1.info"
