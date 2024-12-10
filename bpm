@@ -19,6 +19,7 @@
 
 # Global Variables
 export VERSION="0.1"
+export DIRMAIN="/etc/bpm"
 
 # Color variables
 export RED="\e[1;31m"
@@ -38,8 +39,7 @@ export INFO="${GRAY}[${CYAN}i${GRAY}]${ENDCOLOR}"
 # FUNCTIONS
 
 # Creates config incase it doesnt exist and sources config file
-check_conf() {
-    DIRMAIN="/etc/bpm"
+create_conf() {
     if [[ ! -d "$DIRMAIN" ]]; then
         mkdir -p "$DIRMAIN"
         mkdir -p "$DIRMAIN/index"
@@ -50,53 +50,69 @@ check_conf() {
         echo "REPO=\"\"" >>"$DIRMAIN/bpm.conf"
         echo "WORKING_DIR=\"/var/cache/bpm\"" >>"$DIRMAIN/bpm.conf"
     fi
-    source "$DIRMAIN/bpm.conf"
+}
+
+exec_conf() {
+    if [[ -f "$DIRMAIN/bpm.conf" ]]; then
+        source "$DIRMAIN/bpm.conf"
+    else
+        echo -e "${ERROR} no config file in $DIRMAIN, use \"bpm config\" to generate one"
+        exit 1
+    fi
 }
 
 check_args() {
     case $1 in
     "add")
         check_root
-        check_conf
+        create_conf
+        exec_conf
         shift
         add_packages "$@"
         ;;
     "del")
         check_root
-        check_conf
+        create_conf
+        exec_conf
         shift
         del_packages "$@"
         ;;
     "purge")
         check_root
-        check_conf
+        create_conf
+        exec_conf
         shift
         PURGE="true"
         del_packages "$@"
         ;;
     "update")
         check_root
-        check_conf
+        create_conf
+        exec_conf
         update_packagelist
         ;;
     "upgrade")
         check_root
-        check_conf
+        create_conf
+        exec_conf
         upgrade_package
         ;;
     "config")
         check_root
-        check_conf
+        create_conf
         ;;
     "search")
+        exec_conf
         shift
         search_package "$1"
         ;;
     "info")
+        exec_conf
         shift
         info_package "$1"
         ;;
     "list")
+        exec_conf
         info_packagelist
         ;;
     "help")
