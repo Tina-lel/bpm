@@ -159,6 +159,7 @@ add_packages() {
 
 install_package() {
     local package="$1"
+    set +e
 
     mkdir -p "$WORKING_DIR"
     cd "$WORKING_DIR" || {
