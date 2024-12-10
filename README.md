@@ -39,11 +39,13 @@ usage:  bpm <operation> [...]
 operations:
     bpm add     [package(s)]
     bpm del     [package(s)]
+    bpm update
+    bpm upgrade
+    bpm config
     bpm search  [package]
     bpm info    [package]
     bpm list
-    bpm update
-    bpm upgrade
+    bpm index
     bpm help
     bpm version
 
