@@ -6,6 +6,7 @@ SORT="main"
 DEPENDENCIES=""
 DOWNLOAD="false"
 COMPILE="true"
+ROOT_FOR_INSTALL="true"
 
 INSTALLED_FILES=(/usr/local/bin/bpm_example)
 

@@ -19,7 +19,7 @@
 
 # Global Variables
 export VERSION="0.1"
-export DIRMAIN="/etc/bpm"
+export DIRMAIN="$HOME/.config/bpm"
 
 # Color variables
 export RED="\e[1;31m"
@@ -48,7 +48,7 @@ create_conf() {
         echo "# Created by bpm on $(date '+%Y\%m\%d')" >>"$DIRMAIN/bpm.conf"
         echo "" >>"$DIRMAIN/bpm.conf"
         echo "REPO=\"\"" >>"$DIRMAIN/bpm.conf"
-        echo "WORKING_DIR=\"/var/cache/bpm\"" >>"$DIRMAIN/bpm.conf"
+        echo "WORKING_DIR=\"$HOME/.cache/bpm\"" >>"$DIRMAIN/bpm.conf"
     fi
 }
 
@@ -64,33 +64,24 @@ exec_conf() {
 check_args() {
     case $1 in
     "add")
-        check_root
-        create_conf
         exec_conf
         shift
         add_packages "$@"
         ;;
     "del")
-        check_root
-        create_conf
         exec_conf
         shift
         del_packages "$@"
         ;;
     "update")
-        check_root
-        create_conf
         exec_conf
         update_packagelist
         ;;
     "upgrade")
-        check_root
-        create_conf
         exec_conf
         upgrade_package
         ;;
     "config")
-        check_root
         create_conf
         ;;
     "search")
@@ -122,15 +113,6 @@ check_args() {
         exit 1
         ;;
     esac
-}
-
-check_root() {
-    if [[ "$DEBUG" == "noroot" ]]; then
-        echo -e "${SECTION} running without root"
-    elif [[ "$EUID" -ne 0 ]]; then
-        echo -e "${ERROR} you cannot perform this operation unless you are root."
-        exit 1
-    fi
 }
 
 add_packages() {
@@ -211,8 +193,15 @@ install_package() {
     fi
 
     echo -e "${INFO} Installing package..."
-    INSTALL_PKG
+    if [[ "$ROOT_FOR_INSTALL" == "true" ]]; then
+        # this might be a security vulnurability, but its better than before xd
+        sudo bash -c "$(declare); INSTALL_PKG" 2>/dev/null
+    else
+        INSTALL_PKG
+    fi
+
     echo "INSTALLED_FILES=(${INSTALLED_FILES[*]})" >"$DIRMAIN/index/$package"
+    echo "ROOT_FOR_INSTALL=$ROOT_FOR_INSTALL" >>"$DIRMAIN/index/$package"
 
     echo -e "${INFO} Cleaning up...\n"
     cd "$WORKING_DIR" || {
@@ -260,11 +249,17 @@ remove_package() {
         echo -e "${ERROR} No files to delete"
     fi
 
-    for file_del in "${INSTALLED_FILES[@]}"; do
-        echo -e "${WARNING} Deleting $file_del"
-        # Here goes nothing
-        rm -rf "$file_del"
-    done
+    if [[ "$ROOT_FOR_INSTALL" == "true" ]]; then
+        for file_del in "${INSTALLED_FILES[@]}"; do
+            echo -e "${WARNING} Deleting $file_del"
+            sudo rm -rf "$file_del"
+        done
+    else
+        for file_del in "${INSTALLED_FILES[@]}"; do
+            echo -e "${WARNING} Deleting $file_del"
+            rm -rf "$file_del"
+        done
+    fi
 
     echo -e "${WARNING} Deleting index for $package"
     rm -rf "$DIRMAIN/index/$package"

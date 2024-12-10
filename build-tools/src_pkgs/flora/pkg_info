@@ -6,6 +6,7 @@ SORT="extra"
 DEPENDENCIES=""
 DOWNLOAD="true"
 COMPILE="false"
+ROOT_FOR_INSTALL="true"
 
 INSTALLED_FILES=(/usr/local/bin/flora)
 
