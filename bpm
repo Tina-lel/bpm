@@ -125,7 +125,9 @@ check_args() {
 }
 
 check_root() {
-    if [[ "$EUID" -ne 0 ]]; then
+    if [[ "$DEBUG" == "noroot" ]]; then
+        echo -e "${SECTION} running without root"
+    elif [[ "$EUID" -ne 0 ]]; then
         echo -e "${ERROR} you cannot perform this operation unless you are root."
         exit 1
     fi
