@@ -8,7 +8,6 @@ DOWNLOAD="true"
 COMPILE="false"
 
 INSTALLED_FILES=(/usr/local/bin/flora)
-CONFIG_FILES=($HOME/.config/flora)
 
 DOWNLOAD_SRC() {
     cd $PKG_DIR/src

@@ -77,14 +77,6 @@ check_args() {
         shift
         del_packages "$@"
         ;;
-    "purge")
-        check_root
-        create_conf
-        exec_conf
-        shift
-        PURGE="true"
-        del_packages "$@"
-        ;;
     "update")
         check_root
         create_conf
@@ -219,7 +211,6 @@ install_package() {
     echo -e "${INFO} Installing package..."
     INSTALL_PKG
     echo "INSTALLED_FILES=(${INSTALLED_FILES[*]})" >"$DIRMAIN/index/$package"
-    echo "CONFIG_FILES=(${CONFIG_FILES[*]})" >>"$DIRMAIN/index/$package"
 
     echo -e "${INFO} Cleaning up...\n"
     cd "$WORKING_DIR" || {
@@ -273,16 +264,6 @@ remove_package() {
         rm -rf "$file_del"
     done
 
-    if [[ "$PURGE" == "true" ]]; then
-        if [[ "${#CONFIG_FILES[@]}" != 0 ]]; then
-            for file_del in "${CONFIG_FILES[@]}"; do
-                echo -e "${WARNING} Deleting $file_del"
-                # Mommy im scared
-                rm -rf "$file_del"
-            done
-        fi
-    fi
-
     echo -e "${WARNING} Deleting index for $package"
     rm -rf "$DIRMAIN/index/$package"
 }
@@ -323,7 +304,6 @@ help_message() {
     echo -e "operations:"
     echo -e "    bpm add     [package(s)]"
     echo -e "    bpm del     [package(s)]"
-    echo -e "    bpm purge     [package(s)]"
     echo -e "    bpm update"
     echo -e "    bpm upgrade"
     echo -e "    bpm config"
