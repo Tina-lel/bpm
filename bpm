@@ -38,7 +38,7 @@ export INFO="${GRAY}[${CYAN}i${GRAY}]${ENDCOLOR}"
 
 # FUNCTIONS
 
-# Creates config incase it doesnt exist and sources config file
+# Creates config in case it doesnt exist
 create_conf() {
     if [[ ! -d "$DIRMAIN" ]]; then
         mkdir -p "$DIRMAIN"
@@ -52,6 +52,8 @@ create_conf() {
     fi
 }
 
+# Sources the config file for the script to know the working directory and repo declared by the user
+# The working directory is used to download, cache and compile the packages that are about to be installed
 exec_conf() {
     if [[ -f "$DIRMAIN/bpm.conf" ]]; then
         source "$DIRMAIN/bpm.conf"
@@ -61,6 +63,15 @@ exec_conf() {
     fi
 }
 
+# gets passed all starting arguments in an array at # PROGRAM START
+# located at the bottom of this file
+#
+# Runs pre-checks for each action ensuring the right paths, configs and permissions
+# (except for help and verion because lol)
+# Then it removes the argument from the array using shift, for further processing.
+# Example: bpm add flora socat -> goes to the add case, does pre-checks, removes the first
+# argument and shifts everything the left, going from $1=add $2= flora $3=socat to
+# $1=flora $2=socat
 check_args() {
     case $1 in
     "add")
@@ -118,10 +129,19 @@ check_args() {
     esac
 }
 
+# Checks if the first passed argument is empty if not then proceed with the next check
+# Then checks if in a for loop for each package if it is available in the given repo using
+# generic html status codes
+#
+# Asks kindly for consent and displays the amount and names of the packages that are about
+# to be installed
+#
+# If confirmed passes every package in the array to the install_package function seperatly
 add_packages() {
     if [[ $1 == "" ]]; then
         echo -e "${ERROR} no targets specified."
         exit 1
+    # FIXME: This is not scalable for multiple packages, needs to be rewritten using the packages array
     elif [[ -f "$DIRMAIN/index/$1" ]]; then
         echo -e "${SECTION} package already installed, reinstalling..."
     fi
@@ -157,6 +177,33 @@ add_packages() {
     esac
 }
 
+# Gets the package name from the add_packages() function
+# Checks if the working directory given in the config file is available
+# Then downloads the package.info and package.tar.gz
+# The .info file contains the $SORT variable in which is declared
+# in which sub-repo the tar.gz is located, this can be specified by the maintainer
+# for a more organized repo structure
+#
+# Checks the last line of the .info file containing the checksum for the tar.gz
+# if nothing has been tampered with the tar.gz file gets extracted
+#
+# Creates a variable for easy path handling for the user user specified build instructions
+# Unique for each package
+#
+# Sources the pkg_info file of the package for said instructions
+# the DOWNLOAD_SRC, COMPILE_SRC and INSTALL_SC functions are all inside the pkg_info file
+# which can be a bit confusing but its necessary because not every package is installed the same,
+# so the instructions for installing are all in standardized format inside each package
+#
+# Checks $ROOT_FOR_INSTALL If the package needs root access to install
+# if yes then pass all previously declared variable to the INSTALL_PKG function and run it as root
+# if not just run the INSTALL_PKG normally
+#
+# This next part is very important, it copies the array from the pkg_info containing where the package was installed
+# and puts it inside the config bpm/index folder, this keeps track of which and where packages are installed, the array of
+# where the package has to be installed must be delcared by the maintainer
+#
+# Lastly clears all the downlaoded/compiled files from the working directory because they arent needed anymore
 install_package() {
     local package="$1"
     set +e
@@ -172,6 +219,7 @@ install_package() {
     source "$package.info" >/dev/null 2>&1
     curl -s -o "$package.tar.gz" "$REPO/$SORT/$package.tar.gz"
 
+    # Dont forget to install core-utils for your beloved alpine Tina :3
     echo -e "${INFO} Verifying checksum..."
     cat "$package.info" | tail -n 1 | md5sum --quiet -c - || {
         echo -e "${ERROR} Checksum missmatch"
@@ -180,17 +228,21 @@ install_package() {
 
     echo -e "${INFO} Extracting package..."
     tar -xzf "$package.tar.gz"
+    # Used in the pkg_info file inside the package for the package
+    # specified build/install instructions
     PKG_DIR="$WORKING_DIR/$package"
 
     echo -e "${INFO} Loading build info..."
     source "$PKG_DIR/pkg_info"
     set -e
 
+    # Checks if DOWNLOAD is true in case the source code must be downlaoded externally
     if [[ "$DOWNLOAD" == "true" ]]; then
         echo -e "${INFO} Downloading source..."
         DOWNLOAD_SRC
     fi
 
+    # Checks if COMPILE is true in case the source code must be compiled
     if [[ "$COMPILE" == "true" ]]; then
         echo -e "${INFO} Compiling source..."
         COMPILE_SRC
@@ -215,12 +267,20 @@ install_package() {
     rm -rf "$package.tar.gz" "$package.info" "$package"
 }
 
+# Checks if the first passed argument is empty if not then proceed with the next check
+# Then checks if the package is present in the index, if yes then proceed
+#
+# Asks kindly for consent and displays the amount and names of the packages that are about
+# to be removed
+#
+# If confirmed passes every package in the array to the remove_package function seperatly
 del_packages() {
     if [[ $1 == "" ]]; then
         echo -e "${ERROR} no targets specified."
         exit 1
+    # FIXME: This is not scalable for multiple packages, needs to be rewritten using the packages array
     elif [[ ! -f "$DIRMAIN/index/$1" ]]; then
-        echo -e "${ERROR} package not installed"
+        echo -e "${ERROR} package '$1' not installed"
         exit 1
     fi
 
@@ -245,6 +305,17 @@ del_packages() {
     esac
 }
 
+# Gets the package name from the del_packages() function
+# Sources the index file of the package that is about to be removed,
+#
+# this file contains the paths in where the package was installed
+# If the array containing said file locations is empty the script will remind you so
+#
+# If the package was installed using root the script needs to elivate its privilages to remove the files
+# If a package needs to be installed using root is defined by the maintainer and kept track of inside the index file
+# but if no root privilages are needed the files just get deleted normally
+#
+# After that the index file for the package gets deleted for the package manager to know that it is not installed anymore
 remove_package() {
     local package="$1"
     source "$DIRMAIN/index/$package"
@@ -256,6 +327,7 @@ remove_package() {
     if [[ "$ROOT_FOR_INSTALL" == "true" ]]; then
         for file_del in "${INSTALLED_FILES[@]}"; do
             echo -e "${WARNING} Deleting $file_del"
+            # Does not work with doas ;)
             sudo rm -rf "$file_del"
         done
     else
@@ -269,16 +341,44 @@ remove_package() {
     rm -rf "$DIRMAIN/index/$package"
 }
 
+# Checks if the first passed argument is empty if not then proceed
+#
+# This uses curl to get the list of items in that folder
+# using generic html, then it searches for every file having the .info extention
+# after that strips the href and file extention for display,
+# then the output just gets cut by grep and only the searched package will be displayed
+# if a package was found the script looks inside
+# the .info file of the file that was processed and
+# picks out everything inside the DESCRIPTION variable to print below
 search_package() {
     if [[ $1 == "" ]]; then
         echo -e "${ERROR} no package specified."
         exit 1
     fi
+
     local package="$1"
+
     echo -e "${INFO} Searching for $package"
-    curl --silent "$REPO/info"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | cut -d '.' -f1 | grep "$package"
+    curl --silent "$REPO/info"/ |
+        grep -o 'href=".*\.info">' |
+        sed -e "s/href=\"//g" -e 's/\.info">//g' |
+        grep "$package" |
+        while read -r file; do
+            echo "$file"
+            DESCRIPTION=$(curl --silent "$REPO/info/$file.info" |
+                grep -m 1 '^DESCRIPTION=' |
+                sed -e 's/DESCRIPTION="//' -e 's/"$//')
+            echo -e "${GRAY}    ${DESCRIPTION}${ENDCOLOR}"
+            echo ""
+        done
+
 }
 
+# Checks if the first passed argument is empty if not then proceed
+# Checks if the package the user specified exists inside the /info directory of the repo
+# If a file was found proceeds, if not then displays an error message
+#
+# Then uses curl to display the contents of the .info file of the given package
 info_package() {
     if [[ $1 == "" ]]; then
         echo -e "${ERROR} no package specified."
@@ -295,16 +395,41 @@ info_package() {
     curl --silent "$REPO/info/$package.info"
 }
 
+# List all files inside the /info directory of your repo
+# The containing files should all have the .info extention
+#
+# This uses curl to get the list of items in that folder
+# using generic html, then it searches for every file having the .info extention
+# after that strips the href and file extention for display,
+# after one href has ben formatted the script looks inside
+# the .info file of the file that was processed and
+# picks out everything inside the DESCRIPTION variable to print below
+# Then the cycle continues for every package
 info_packagelist() {
     echo -e "${INFO} Listing of $REPO\n"
-    curl --silent "$REPO/info"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | cut -d '.' -f1
+    curl --silent "$REPO/info"/ |
+        grep -o 'href=".*\.info">' |
+        sed -e "s/href=\"//g" -e 's/\.info">//g' |
+        while read -r file; do
+            echo "$file"
+            DESCRIPTION=$(curl --silent "$REPO/info/$file.info" |
+                grep -m 1 '^DESCRIPTION=' |
+                sed -e 's/DESCRIPTION="//' -e 's/"$//')
+            echo -e "${GRAY}    ${DESCRIPTION}${ENDCOLOR}"
+            echo ""
+        done
 }
 
+# List all the folders in a list inside the index folder
+# of the working directory of bpm to keep track of where packages
+# are installed, check your bpm config file
+# to see the current working directory
 info_index() {
     echo -e "${INFO} Listing installed Packages\n"
     ls -1 "$DIRMAIN/index"
 }
 
+# Try not to change me every 10 commits challange (Impossible)
 help_message() {
     echo -e "usage:  bpm <operation> [...]"
     echo -e "operations:"
@@ -323,6 +448,9 @@ help_message() {
     exit 0
 }
 
+# Generic version message with some licensing
+# Displays a fitting mascot in the spirit of bash!
+# (Best programming language (non negociable))
 version_message() {
     echo -e ""
     echo -e "───▄▄▄         bpm v$VERSION - bash 5.2.37"
