@@ -98,6 +98,9 @@ check_args() {
         exec_conf
         info_packagelist
         ;;
+    "index")
+        info_index
+        ;;
     "help")
         help_message
         ;;
@@ -296,6 +299,11 @@ info_packagelist() {
     curl --silent "$REPO/info"/ | grep -o 'href=".*">' | sed -e "s/href=\"//g" | sed -e 's/">//g' | tail -n +2 | cut -d '.' -f1
 }
 
+info_index() {
+    echo -e "${INFO} Listing installed Packages\n"
+    ls -1 "$DIRMAIN/index"
+}
+
 help_message() {
     echo -e "usage:  bpm <operation> [...]"
     echo -e "operations:"
@@ -307,6 +315,7 @@ help_message() {
     echo -e "    bpm search  [package]"
     echo -e "    bpm info    [package]"
     echo -e "    bpm list"
+    echo -e "    bpm index"
     echo -e "    bpm help"
     echo -e "    bpm version"
     echo -e ""
