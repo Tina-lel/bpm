@@ -7,7 +7,8 @@ DEPENDENCIES=""
 DOWNLOAD="true"
 COMPILE="false"
 
-INSTALLED_FILES=($HOME/Desktop/flora $HOME/Desktop/test)
+INSTALLED_FILES=(/usr/local/bin/flora)
+CONFIG_FILES=($HOME/.config/flora)
 
 DOWNLOAD_SRC() {
     cd $PKG_DIR/src
@@ -16,5 +17,5 @@ DOWNLOAD_SRC() {
 
 INSTALL_PKG() {
     chmod +x $PKG_DIR/src/Flora/flora
-    mv $PKG_DIR/src/Flora/flora ~/Desktop/
+    mv $PKG_DIR/src/Flora/flora /usr/local/bin/
 }

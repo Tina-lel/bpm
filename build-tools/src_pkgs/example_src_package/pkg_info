@@ -7,10 +7,13 @@ DEPENDENCIES=""
 DOWNLOAD="false"
 COMPILE="true"
 
+INSTALLED_FILES=(/usr/local/bin/bpm_example)
+CONFIG_FILES=()
+
 COMPILE_SRC() {
     gcc -o $PKG_DIR/build/bpm_example -O2 $PKG_DIR/src/main.c
 }
 
 INSTALL_PKG() {
-    mv $PKG_DIR/build/bpm_example ~/Desktop/
+    mv $PKG_DIR/build/bpm_example /usr/local/bin/
 }

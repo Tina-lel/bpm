@@ -31,6 +31,7 @@ export ENDCOLOR="\e[0m"
 # Info variables
 export SUCCSESS="${GRAY}[${GREEN}✓${GRAY}]${ENDCOLOR}"
 export ERROR="${RED}Error:${ENDCOLOR}"
+export WARNING="${GRAY}[${RED}!${GRAY}]${ENDCOLOR}"
 export SECTION="${GRAY}[${YELLOW}!${GRAY}]${ENDCOLOR}"
 export INFO="${GRAY}[${CYAN}i${GRAY}]${ENDCOLOR}"
 
@@ -38,7 +39,7 @@ export INFO="${GRAY}[${CYAN}i${GRAY}]${ENDCOLOR}"
 
 # Creates config incase it doesnt exist and sources config file
 check_conf() {
-    DIRMAIN="$HOME/.config/bpm"
+    DIRMAIN="/etc/bpm"
     if [[ ! -d "$DIRMAIN" ]]; then
         mkdir -p "$DIRMAIN"
         mkdir -p "$DIRMAIN/index"
@@ -47,7 +48,7 @@ check_conf() {
         echo "# Created by bpm on $(date '+%Y\%m\%d')" >>"$DIRMAIN/bpm.conf"
         echo "" >>"$DIRMAIN/bpm.conf"
         echo "REPO=\"\"" >>"$DIRMAIN/bpm.conf"
-        echo "WORKING_DIR=\"$HOME/.cache/bpm\"" >>"$DIRMAIN/bpm.conf"
+        echo "WORKING_DIR=\"/var/cache/bpm\"" >>"$DIRMAIN/bpm.conf"
     fi
     source "$DIRMAIN/bpm.conf"
 }
@@ -55,12 +56,37 @@ check_conf() {
 check_args() {
     case $1 in
     "add")
+        check_root
+        check_conf
         shift
         add_packages "$@"
         ;;
     "del")
+        check_root
+        check_conf
         shift
         del_packages "$@"
+        ;;
+    "purge")
+        check_root
+        check_conf
+        shift
+        PURGE="true"
+        del_packages "$@"
+        ;;
+    "update")
+        check_root
+        check_conf
+        update_packagelist
+        ;;
+    "upgrade")
+        check_root
+        check_conf
+        upgrade_package
+        ;;
+    "config")
+        check_root
+        check_conf
         ;;
     "search")
         shift
@@ -69,12 +95,6 @@ check_args() {
     "info")
         shift
         info_package "$1"
-        ;;
-    "update")
-        update_packagelist
-        ;;
-    "upgrade")
-        upgrade_package
         ;;
     "list")
         info_packagelist
@@ -94,6 +114,13 @@ check_args() {
         exit 1
         ;;
     esac
+}
+
+check_root() {
+    if [[ "$EUID" -ne 0 ]]; then
+        echo -e "${ERROR} you cannot perform this operation unless you are root."
+        exit 1
+    fi
 }
 
 add_packages() {
@@ -175,7 +202,8 @@ install_package() {
 
     echo -e "${INFO} Installing package..."
     INSTALL_PKG
-    echo "INSTALLED_FILES=(${INSTALLED_FILES[*]})" >>"$DIRMAIN/index/$package"
+    echo "INSTALLED_FILES=(${INSTALLED_FILES[*]})" >"$DIRMAIN/index/$package"
+    echo "CONFIG_FILES=(${CONFIG_FILES[*]})" >>"$DIRMAIN/index/$package"
 
     echo -e "${INFO} Cleaning up...\n"
     cd "$WORKING_DIR" || {
@@ -183,6 +211,64 @@ install_package() {
         exit 1
     }
     rm -rf "$package.tar.gz" "$package.info" "$package"
+}
+
+del_packages() {
+    if [[ $1 == "" ]]; then
+        echo -e "${ERROR} no targets specified."
+        exit 1
+    elif [[ ! -f "$DIRMAIN/index/$1" ]]; then
+        echo -e "${ERROR} package not installed"
+        exit 1
+    fi
+
+    local packages=("$@")
+    local package_amount=${#packages[@]}
+
+    echo -e ""
+    echo -e "${WARNING} Packages ($package_amount): ${packages[*]}"
+    echo -e ""
+    read -rp "Proceed with removal? [y/N] " confirm
+    case "$confirm" in
+    [yY])
+        for package_del in "${packages[@]}"; do
+            echo -e "${SECTION} Removing $package_del"
+            remove_package "$package_del"
+        done
+        ;;
+    *)
+        echo -e "${RED}Aborted.${ENDCOLOR}"
+        exit 0
+        ;;
+    esac
+}
+
+remove_package() {
+    local package="$1"
+    source "$DIRMAIN/index/$package"
+
+    if [[ "${#INSTALLED_FILES[@]}" == 0 ]]; then
+        echo -e "${ERROR} No files to delete"
+    fi
+
+    for file_del in "${INSTALLED_FILES[@]}"; do
+        echo -e "${WARNING} Deleting $file_del"
+        # Here goes nothing
+        rm -rf "$file_del"
+    done
+
+    if [[ "$PURGE" == "true" ]]; then
+        if [[ "${#CONFIG_FILES[@]}" != 0 ]]; then
+            for file_del in "${CONFIG_FILES[@]}"; do
+                echo -e "${WARNING} Deleting $file_del"
+                # Mommy im scared
+                rm -rf "$file_del"
+            done
+        fi
+    fi
+
+    echo -e "${WARNING} Deleting index for $package"
+    rm -rf "$DIRMAIN/index/$package"
 }
 
 search_package() {
@@ -246,5 +332,4 @@ version_message() {
 
 # PROGRAM START
 
-check_conf
 check_args "$@"
