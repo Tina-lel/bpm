@@ -362,7 +362,7 @@ update_packagelist() {
             DESCRIPTION=$(curl --silent "$REPO/info/$file.info" | grep -m 1 '^DESCRIPTION=' | sed -e 's/DESCRIPTION="//' -e 's/"$//')
             echo -e "${BOLD}${SORT}/${file}${ENDCOLOR}"
             echo -e "${GRAY}    ${DESCRIPTION}${ENDCOLOR}"
-            #echo ""
+            echo ""
         done > "$DIRMAIN/remote"
 }
 
@@ -396,7 +396,7 @@ search_package() {
 
     echo -e "${INFO} Last updated on $(date -r $DIRMAIN/remote  "+%Y-%m-%d / %H:%M:%S")"
 
-    cat "$DIRMAIN/remote" | grep -A1 -B1 "$package"
+    cat "$DIRMAIN/remote" | grep -i -A1 -B1 "$package"
 }
 
 # Checks if the first passed argument is empty if not then proceed
