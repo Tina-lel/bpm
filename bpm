@@ -362,7 +362,7 @@ update_packagelist() {
             DESCRIPTION=$(curl --silent "$REPO/info/$file.info" | grep -m 1 '^DESCRIPTION=' | sed -e 's/DESCRIPTION="//' -e 's/"$//')
             echo -e "${BOLD}${SORT}/${file}${ENDCOLOR}"
             echo -e "${GRAY}    ${DESCRIPTION}${ENDCOLOR}"
-            echo ""
+            #echo ""
         done > "$DIRMAIN/remote"
 }
 
