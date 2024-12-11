@@ -244,7 +244,6 @@ install_package() {
     }
 
     echo -e "${INFO} Downloading package..."
-    #curl -s -o "$package.info" "$REPO/info/$package.info"
     source "$package.info" >/dev/null 2>&1
     curl -s -o "$package.tar.gz" "$REPO/$SORT/$package.tar.gz"
 
@@ -288,6 +287,7 @@ install_package() {
     echo "INSTALLED_FILES=(${INSTALLED_FILES[*]})" >"$DIRMAIN/index/$package"
     echo "ROOT_FOR_INSTALL=$ROOT_FOR_INSTALL" >>"$DIRMAIN/index/$package"
     echo "VERSION=$VERSION" >>"$DIRMAIN/index/$package"
+    echo "SIZE=$SIZE" >>"$DIRMAIN/index/$package"
 
     echo -e "${INFO} Cleaning up...\n"
     cd "$WORKING_DIR" || {
@@ -311,6 +311,7 @@ del_packages() {
     fi
 
     local packages=("$@")
+    local packages_size=0
     local package_amount=${#packages[@]}
 
     # there i fixed the shit
@@ -318,11 +319,16 @@ del_packages() {
         if [[ ! -f "$DIRMAIN/index/$package" ]]; then
             echo -e "${ERROR} package '$package' not installed"
             exit 1
+        else
+            source "$DIRMAIN/index/$package"
+            packages_size=$(( "$packages_size" + "$SIZE" ))
         fi
     done
 
     echo -e ""
     echo -e "${WARNING} Packages ($package_amount): ${packages[*]}"
+    echo -e ""
+    echo -e "Total Removed Size: -$(numfmt --to=iec $packages_size)"
     echo -e ""
     read -rp "Proceed with removal? [y/N] " confirm
     case "$confirm" in
