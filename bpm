@@ -148,9 +148,10 @@ add_packages() {
     fi
 
     local packages=("$@")
+    local packages_size=0
+    local packages_size_final=0
     local package_amount=${#packages[@]}
 
-    # FIXME: This is not scalable for multiple packages, needs to be rewritten using the packages array
     for package in "${packages[@]}"; do
         if [[ -f "$DIRMAIN/index/$package" ]]; then
             source "$DIRMAIN/index/$package"
@@ -170,11 +171,19 @@ add_packages() {
         if [[ "$AVAILABILITY" != "200" ]]; then
             echo -e "${ERROR} Cant download package info for '$package_check'"
             exit 1
+        else
+            curl -s -o "$WORKING_DIR/$package_check.info" "$REPO/info/$package_check.info"
+            source "$WORKING_DIR/$package_check.info" >/dev/null 2>&1
+            packages_size=$(( "$packages_size" + "$SIZE" ))
+            packages_size_final=$(( "$packages_size_final" + "$SIZE_EXTRACT" ))
         fi
     done
 
     echo -e ""
     echo -e "${INFO} Packages ($package_amount): ${packages[*]}"
+    echo -e ""
+    echo -e "Total Download Size:  $(numfmt --to=iec $packages_size)"
+    echo -e "Total Extracted Size: $(numfmt --to=iec $packages_size_final)"
     echo -e ""
     read -rp "Proceed with installation? [Y/n] " confirm
     case "$confirm" in
@@ -229,7 +238,7 @@ install_package() {
     }
 
     echo -e "${INFO} Downloading package..."
-    curl -s -o "$package.info" "$REPO/info/$package.info"
+    #curl -s -o "$package.info" "$REPO/info/$package.info"
     source "$package.info" >/dev/null 2>&1
     curl -s -o "$package.tar.gz" "$REPO/$SORT/$package.tar.gz"
 
