@@ -61,8 +61,8 @@ operations:
 - [X] ~/.config/bpm.conf for various stuff
 - [X] Search by package name and description
 - [X] Update function with new version display
+- [X] Installed, Upgraded, Removed Packages net size
 - [ ] x86 64bit, 32bit and arm support
-- [ ] Installed, Upgraded, Removed Packages net size
 
 ## Backend
 
