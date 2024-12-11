@@ -343,6 +343,8 @@ remove_package() {
     rm -rf "$DIRMAIN/index/$package"
 }
 
+# CHANGEME
+
 update_packagelist() {
     echo -e "${INFO} Refreshing local remote list"
     curl --silent "$REPO/info"/ | grep -o 'href=".*\.info">' | sed -e "s/href=\"//g" -e 's/\.info">//g' |
@@ -356,12 +358,16 @@ update_packagelist() {
         done > "$DIRMAIN/remote"
 }
 
+# CHANGEME
+
 check_packagelist() {
     if [[ ! -f "$DIRMAIN/remote" ]]; then
         echo -e "${ERROR} please run \"bpm update\" first"
         exit 1
     fi
 }
+
+# CHANGEME
 
 # Checks if the first passed argument is empty if not then proceed
 #
@@ -380,9 +386,9 @@ search_package() {
 
     local package="$1"
 
-    echo -e "${INFO} Last updated on $(date -r $DIRMAIN/remote  "+%Y-%m-%d / %H:%M:%S\n")"
+    echo -e "${INFO} Last updated on $(date -r $DIRMAIN/remote  "+%Y-%m-%d / %H:%M:%S")"
 
-    cat "$DIRMAIN/remote" | grep -A1 "$package"
+    cat "$DIRMAIN/remote" | GREP_COLORS='ms=01;35' grep --color=always -A1 -B1 "$package"
 }
 
 # Checks if the first passed argument is empty if not then proceed
@@ -405,6 +411,8 @@ info_package() {
     echo -e "${INFO} Info for $package"
     curl --silent "$REPO/info/$package.info"
 }
+
+# CHANGEME
 
 # List all files inside the /info directory of your repo
 # The containing files should all have the .info extention

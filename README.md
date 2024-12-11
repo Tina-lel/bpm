@@ -58,7 +58,7 @@ operations:
 - [X] File Checksums
 - [ ] Parallel downloads
 - [ ] Full Tool Arguments
-- [ ] Local packages list
+- [X] Local packages list
 - [ ] /etc/bpm.conf for various stuff
 - [ ] x86 64bit, 32bit and arm support
 - [ ] Search by package name and description
