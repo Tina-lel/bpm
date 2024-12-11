@@ -143,13 +143,17 @@ add_packages() {
     if [[ $1 == "" ]]; then
         echo -e "${ERROR} no targets specified."
         exit 1
-    # FIXME: This is not scalable for multiple packages, needs to be rewritten using the packages array
-    elif [[ -f "$DIRMAIN/index/$1" ]]; then
-        echo -e "${SECTION} package already installed, reinstalling..."
     fi
 
     local packages=("$@")
     local package_amount=${#packages[@]}
+
+    # FIXME: This is not scalable for multiple packages, needs to be rewritten using the packages array
+    for package in "${packages[@]}"; do
+        if [[ -f "$DIRMAIN/index/$package" ]]; then
+            echo -e "${SECTION} package $package already installed, reinstalling..."
+        fi
+    done
 
     # This checks wether or not the specified package name is available at the
     # remote repo via an http code (200 means downloadable, so continue)
@@ -280,14 +284,18 @@ del_packages() {
     if [[ $1 == "" ]]; then
         echo -e "${ERROR} no targets specified."
         exit 1
-    # FIXME: This is not scalable for multiple packages, needs to be rewritten using the packages array
-    elif [[ ! -f "$DIRMAIN/index/$1" ]]; then
-        echo -e "${ERROR} package '$1' not installed"
-        exit 1
     fi
 
     local packages=("$@")
     local package_amount=${#packages[@]}
+
+    # there i fixed the shit
+    for package in "${packages[@]}"; do
+        if [[ ! -f "$DIRMAIN/index/$package" ]]; then
+            echo -e "${ERROR} package '$package' not installed"
+            exit 1
+        fi
+    done
 
     echo -e ""
     echo -e "${WARNING} Packages ($package_amount): ${packages[*]}"
