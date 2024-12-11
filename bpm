@@ -98,6 +98,7 @@ check_args() {
     "search")
         exec_conf
         shift
+        check_packagelist
         search_package "$1"
         ;;
     "info")
@@ -107,6 +108,7 @@ check_args() {
         ;;
     "list")
         exec_conf
+        check_packagelist
         info_packagelist
         ;;
     "index")
@@ -341,6 +343,26 @@ remove_package() {
     rm -rf "$DIRMAIN/index/$package"
 }
 
+update_packagelist() {
+    echo -e "${INFO} Refreshing local remote list"
+    curl --silent "$REPO/info"/ | grep -o 'href=".*\.info">' | sed -e "s/href=\"//g" -e 's/\.info">//g' |
+        while read -r file; do
+            echo "$file"
+            DESCRIPTION=$(curl --silent "$REPO/info/$file.info" |
+                grep -m 1 '^DESCRIPTION=' |
+                sed -e 's/DESCRIPTION="//' -e 's/"$//')
+            echo -e "${GRAY}    ${DESCRIPTION}${ENDCOLOR}"
+            echo ""
+        done > "$DIRMAIN/remote"
+}
+
+check_packagelist() {
+    if [[ ! -f "$DIRMAIN/remote" ]]; then
+        echo -e "${ERROR} please run \"bpm update\" first"
+        exit 1
+    fi
+}
+
 # Checks if the first passed argument is empty if not then proceed
 #
 # This uses curl to get the list of items in that folder
@@ -358,20 +380,9 @@ search_package() {
 
     local package="$1"
 
-    echo -e "${INFO} Searching for $package"
-    curl --silent "$REPO/info"/ |
-        grep -o 'href=".*\.info">' |
-        sed -e "s/href=\"//g" -e 's/\.info">//g' |
-        grep "$package" |
-        while read -r file; do
-            echo "$file"
-            DESCRIPTION=$(curl --silent "$REPO/info/$file.info" |
-                grep -m 1 '^DESCRIPTION=' |
-                sed -e 's/DESCRIPTION="//' -e 's/"$//')
-            echo -e "${GRAY}    ${DESCRIPTION}${ENDCOLOR}"
-            echo ""
-        done
+    echo -e "${INFO} Last updated on $(date -r $DIRMAIN/remote  "+%Y-%m-%d / %H:%M:%S\n")"
 
+    cat "$DIRMAIN/remote" | grep -A1 "$package"
 }
 
 # Checks if the first passed argument is empty if not then proceed
@@ -406,18 +417,8 @@ info_package() {
 # picks out everything inside the DESCRIPTION variable to print below
 # Then the cycle continues for every package
 info_packagelist() {
-    echo -e "${INFO} Listing of $REPO\n"
-    curl --silent "$REPO/info"/ |
-        grep -o 'href=".*\.info">' |
-        sed -e "s/href=\"//g" -e 's/\.info">//g' |
-        while read -r file; do
-            echo "$file"
-            DESCRIPTION=$(curl --silent "$REPO/info/$file.info" |
-                grep -m 1 '^DESCRIPTION=' |
-                sed -e 's/DESCRIPTION="//' -e 's/"$//')
-            echo -e "${GRAY}    ${DESCRIPTION}${ENDCOLOR}"
-            echo ""
-        done
+    echo -e "${INFO} Last updated on $(date -r $DIRMAIN/remote  "+%Y-%m-%d / %H:%M:%S\n")"
+    cat "$DIRMAIN/remote"
 }
 
 # List all the folders in a list inside the index folder
