@@ -91,7 +91,8 @@ check_args() {
         ;;
     "upgrade")
         exec_conf
-        upgrade_package
+        update_packagelist
+        upgrade_packages
         ;;
     "config")
         create_conf
@@ -152,7 +153,13 @@ add_packages() {
     # FIXME: This is not scalable for multiple packages, needs to be rewritten using the packages array
     for package in "${packages[@]}"; do
         if [[ -f "$DIRMAIN/index/$package" ]]; then
-            echo -e "${SECTION} package $package already installed, reinstalling..."
+            source "$DIRMAIN/index/$package"
+            REMOTE_VERSION=$(cat $DIRMAIN/remote | grep $package | cut -d " " -f2)
+            if [[ "$VERSION" != "$REMOTE_VERSION" ]]; then
+                echo -e "${SECTION} Updating $package ($VERSION -> $REMOTE_VERSION)"
+            else
+                echo -e "${SECTION} package $package already installed, reinstalling..."
+            fi
         fi
     done
 
@@ -265,6 +272,7 @@ install_package() {
 
     echo "INSTALLED_FILES=(${INSTALLED_FILES[*]})" >"$DIRMAIN/index/$package"
     echo "ROOT_FOR_INSTALL=$ROOT_FOR_INSTALL" >>"$DIRMAIN/index/$package"
+    echo "VERSION=$VERSION" >>"$DIRMAIN/index/$package"
 
     echo -e "${INFO} Cleaning up...\n"
     cd "$WORKING_DIR" || {
@@ -359,13 +367,48 @@ update_packagelist() {
     curl --silent "$REPO/info"/ | grep -o 'href=".*\.info">' | sed -e "s/href=\"//g" -e 's/\.info">//g' |
         while read -r file; do
             curl --silent -o "$WORKING_DIR/$file.info" "$REPO/info/$file.info"
+            VERSION=$(cat "$WORKING_DIR/$file.info" | grep -m 1 '^VERSION=' | sed -e 's/VERSION="//' -e 's/"$//')
             SORT=$(cat "$WORKING_DIR/$file.info" | grep -m 1 '^SORT=' | sed -e 's/SORT="//' -e 's/"$//')
             DESCRIPTION=$(cat "$WORKING_DIR/$file.info" | grep -m 1 '^DESCRIPTION=' | sed -e 's/DESCRIPTION="//' -e 's/"$//')
-            echo -e "${BOLD}${SORT}/${file}${ENDCOLOR}"
-            echo -e "${GRAY}    ${DESCRIPTION}${ENDCOLOR}"
+            #echo -e "${BOLD}${SORT}/${file} ${GRAY}$VERSION${ENDCOLOR}"
+            #echo -e "${GRAY}    ${DESCRIPTION}${ENDCOLOR}"
+            echo -e "${SORT}/${file} $VERSION"
+            echo -e "    ${DESCRIPTION}"
             echo ""
             rm "$WORKING_DIR/$file.info"
         done > "$DIRMAIN/remote"
+}
+
+# CHANGEME
+
+upgrade_packages() {
+    if [[ -z "$(ls -A $DIRMAIN/index/)" ]]; then
+        echo -e "${ERROR} No packages installed"
+        exit 1
+    fi
+
+    echo -e "${INFO} Checking for updates"
+
+    local packages_info=($DIRMAIN/index/*)
+    local packages_to_upgrade=()
+    local package_amount=${#packages_to_upgrade[@]}
+
+    for package_info in "${packages_info[@]}"; do
+        local package="${package_info##*/}"
+        source "$package_info"
+        REMOTE_VERSION=$(cat $DIRMAIN/remote | grep $package | cut -d " " -f2)
+        if [[ "$VERSION" != "$REMOTE_VERSION" ]]; then
+            packages_to_upgrade+=("$package")
+        else
+            continue
+        fi
+    done
+
+    if [[ ${#packages_to_upgrade[@]} != 0 ]]; then
+        add_packages "${packages_to_upgrade[@]}"
+    else
+        echo -e "${SECTION} Nothing to do"
+    fi
 }
 
 # CHANGEME

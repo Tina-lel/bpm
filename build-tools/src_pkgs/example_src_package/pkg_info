@@ -1,5 +1,6 @@
 # Package info (Example Package v1)
 DESCRIPTION="Example package for BPM"
+VERSION="1.0"
 
 SORT="main"
 

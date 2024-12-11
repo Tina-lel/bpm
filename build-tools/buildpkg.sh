@@ -24,6 +24,7 @@ case "$1" in
         echo -e "Writing $i.info"
 
         echo "DESCRIPTION=\"$DESCRIPTION\"" > "../pkgs/info/$i.info"
+        echo "VERSION=\"$VERSION\"" >> "../pkgs/info/$i.info"
         echo "SORT=\"$SORT\"" >> "../pkgs/info/$i.info"
         echo "SIZE=\"$(du --apparent-size -hs ../pkgs/$SORT/$i.tar.gz | cut -f1)\"" >> "../pkgs/info/$i.info"
         echo "SIZE_EXTRACT=\"$(du --apparent-size -hs $i | cut -f1)\"" >> "../pkgs/info/$i.info"
@@ -78,6 +79,7 @@ tar -czf "../pkgs/$SORT/$1.tar.gz" "$1"
 echo -e "Writing $1.info"
 
 echo "DESCRIPTION=\"$DESCRIPTION\"" > "../pkgs/info/$1.info"
+echo "VERSION=\"$VERSION\"" >> "../pkgs/info/$1.info"
 echo "SORT=\"$SORT\"" >> "../pkgs/info/$1.info"
 echo "SIZE=\"$(du --apparent-size -hs ../pkgs/$SORT/$1.tar.gz | cut -f1)\"" >> "../pkgs/info/$1.info"
 echo "SIZE_EXTRACT=\"$(du --apparent-size -hs $1 | cut -f1)\"" >> "../pkgs/info/$1.info"
