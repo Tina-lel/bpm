@@ -62,6 +62,11 @@ exec_conf() {
         echo -e "${ERROR} no config file in $DIRMAIN, use \"bpm config\" to generate one"
         exit 1
     fi
+
+    if [[ -z "${WORKING_DIR}" ]]; then
+        echo -e "${ERROR} WORKING_DIR unset, check config file"
+        exit 1
+    fi
 }
 
 # gets passed all starting arguments in an array at # PROGRAM START
@@ -188,6 +193,7 @@ add_packages() {
     read -rp "Proceed with installation? [Y/n] " confirm
     case "$confirm" in
     [nN])
+        rm $WORKING_DIR/*.info
         echo -e "${RED}Aborted.${ENDCOLOR}"
         exit 0
         ;;
