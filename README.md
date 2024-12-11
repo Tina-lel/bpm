@@ -56,12 +56,11 @@ operations:
 ## Frontend
 
 - [X] File Checksums
-- [ ] Parallel downloads
-- [ ] Full Tool Arguments
+- [X] Full Tool Arguments
 - [X] Local packages list
-- [ ] /etc/bpm.conf for various stuff
+- [X] ~/.config/bpm.conf for various stuff
+- [X] Search by package name and description
 - [ ] x86 64bit, 32bit and arm support
-- [ ] Search by package name and description
 - [ ] Update function with new version display
 - [ ] Installed, Upgraded, Removed Packages net size
 
