@@ -358,11 +358,13 @@ update_packagelist() {
     echo -e "${INFO} Refreshing local remote list"
     curl --silent "$REPO/info"/ | grep -o 'href=".*\.info">' | sed -e "s/href=\"//g" -e 's/\.info">//g' |
         while read -r file; do
-            SORT=$(curl --silent "$REPO/info/$file.info" | grep -m 1 '^SORT=' | sed -e 's/SORT="//' -e 's/"$//')
-            DESCRIPTION=$(curl --silent "$REPO/info/$file.info" | grep -m 1 '^DESCRIPTION=' | sed -e 's/DESCRIPTION="//' -e 's/"$//')
+            curl --silent -o "$WORKING_DIR/$file.info" "$REPO/info/$file.info"
+            SORT=$(cat "$WORKING_DIR/$file.info" | grep -m 1 '^SORT=' | sed -e 's/SORT="//' -e 's/"$//')
+            DESCRIPTION=$(cat "$WORKING_DIR/$file.info" | grep -m 1 '^DESCRIPTION=' | sed -e 's/DESCRIPTION="//' -e 's/"$//')
             echo -e "${BOLD}${SORT}/${file}${ENDCOLOR}"
             echo -e "${GRAY}    ${DESCRIPTION}${ENDCOLOR}"
             echo ""
+            rm "$WORKING_DIR/$file.info"
         done > "$DIRMAIN/remote"
 }
 
