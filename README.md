@@ -60,8 +60,8 @@ operations:
 - [X] Local packages list
 - [X] ~/.config/bpm.conf for various stuff
 - [X] Search by package name and description
+- [X] Update function with new version display
 - [ ] x86 64bit, 32bit and arm support
-- [ ] Update function with new version display
 - [ ] Installed, Upgraded, Removed Packages net size
 
 ## Backend
