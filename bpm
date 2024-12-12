@@ -18,7 +18,7 @@
 #===============================================================================
 
 # Global Variables
-export VERSION="0.1"
+export BPM_VERSION="0.1"
 export DIRMAIN="$HOME/.config/bpm"
 
 # Color variables
@@ -44,6 +44,7 @@ create_conf() {
     if [[ ! -d "$DIRMAIN" ]]; then
         mkdir -p "$DIRMAIN"
         mkdir -p "$DIRMAIN/index"
+        mkdir -p "$HOME/.cache/bpm"
         touch "$DIRMAIN/bpm.conf"
 
         echo "# Created by bpm on $(date '+%Y\%m\%d')" >>"$DIRMAIN/bpm.conf"
@@ -122,6 +123,9 @@ check_args() {
     "index")
         info_index
         ;;
+    "clean")
+        clean_cache
+        ;;
     "help")
         help_message
         ;;
@@ -182,8 +186,8 @@ add_packages() {
         else
             curl -s -o "$WORKING_DIR/$package_check.info" "$REPO/info/$package_check.info"
             source "$WORKING_DIR/$package_check.info" >/dev/null 2>&1
-            packages_size=$(( "$packages_size" + "$SIZE" ))
-            packages_size_final=$(( "$packages_size_final" + "$SIZE_EXTRACT" ))
+            packages_size=$(("$packages_size" + "$SIZE"))
+            packages_size_final=$(("$packages_size_final" + "$SIZE_EXTRACT"))
         fi
     done
 
@@ -325,7 +329,7 @@ del_packages() {
             exit 1
         else
             source "$DIRMAIN/index/$package"
-            packages_size=$(( "$packages_size" + "$SIZE" ))
+            packages_size=$(("$packages_size" + "$SIZE"))
         fi
     done
 
@@ -403,7 +407,7 @@ update_packagelist() {
             #echo -e "${file}_array=( \"$VERSION\" \"$SORT\" \"$DESCRIPTION\" )"
             echo -e "${file}=( \"$VERSION\" \"$SORT\" \"$DESCRIPTION\" )"
             rm "$WORKING_DIR/$file.info"
-        done > "$DIRMAIN/remote"
+        done >"$DIRMAIN/remote"
 }
 
 # CHANGEME
@@ -468,7 +472,7 @@ search_package() {
 
     local package="$1"
 
-    echo -e "${INFO} Last updated on $(date -r $DIRMAIN/remote  "+%Y-%m-%d / %H:%M:%S")"
+    echo -e "${INFO} Last updated on $(date -r $DIRMAIN/remote "+%Y-%m-%d / %H:%M:%S")"
 
     cat "$DIRMAIN/remote" | grep -i "$package"
 }
@@ -507,7 +511,7 @@ info_package() {
 # picks out everything inside the DESCRIPTION variable to print below
 # Then the cycle continues for every package
 info_packagelist() {
-    echo -e "${INFO} Last updated on $(date -r $DIRMAIN/remote  "+%Y-%m-%d / %H:%M:%S\n")"
+    echo -e "${INFO} Last updated on $(date -r $DIRMAIN/remote "+%Y-%m-%d / %H:%M:%S\n")"
     cat "$DIRMAIN/remote"
 }
 
@@ -518,6 +522,13 @@ info_packagelist() {
 info_index() {
     echo -e "${INFO} Listing installed Packages\n"
     ls -1 "$DIRMAIN/index"
+}
+
+# OCD - Justus0405
+clean_cache() {
+    echo -e "${INFO} Clearing cache..."
+    rm -rf "$HOME/.cache/bpm/"
+    mkdir -p "$HOME/.cache/bpm"
 }
 
 # Try not to change me every 10 commits challange (Impossible)
@@ -544,7 +555,7 @@ help_message() {
 # (Best programming language (non negociable))
 version_message() {
     echo -e ""
-    echo -e "───▄▄▄         bpm v$VERSION - bash 5.2.37"
+    echo -e "───▄▄▄         bpm v$BPM_VERSION - bash 5.2.37"
     echo -e "─▄▀░▄░▀▄       Copyright (C) 2024-present Tina-lel"
     echo -e "─█░█▄▀░█       Copyright (C) 2024-present Justus0405"
     echo -e "─█░▀▄▄▀█▄█▄▀"
