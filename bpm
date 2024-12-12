@@ -526,12 +526,12 @@ info_index() {
 
 # OCD - Justus0405
 clean_cache() {
-    echo -e "${INFO} Clearing cache..."
     if [[ -z "$WORKING_DIR" ]]; then
         echo -e "${ERROR} WORKING_DIR is not set. Stupidity Protection. Exiting."
         exit 1
     fi
 
+    echo -e "${INFO} Clearing cache..."
     rm -rf "$WORKING_DIR"
     mkdir -p "$WORKING_DIR"
 }
