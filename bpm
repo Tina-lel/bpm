@@ -44,7 +44,6 @@ create_conf() {
     if [[ ! -d "$DIRMAIN" ]]; then
         mkdir -p "$DIRMAIN"
         mkdir -p "$DIRMAIN/index"
-        mkdir -p "$HOME/.cache/bpm"
         touch "$DIRMAIN/bpm.conf"
 
         echo "# Created by bpm on $(date '+%Y\%m\%d')" >>"$DIRMAIN/bpm.conf"
@@ -68,6 +67,9 @@ exec_conf() {
         echo -e "${ERROR} WORKING_DIR unset, check config file"
         exit 1
     fi
+
+    mkdir -p "$WORKING_DIR"
+
 }
 
 # gets passed all starting arguments in an array at # PROGRAM START
@@ -104,6 +106,10 @@ check_args() {
     "config")
         create_conf
         ;;
+    "clean")
+        exec_conf
+        clean_cache
+        ;;
     "search")
         exec_conf
         shift
@@ -122,9 +128,6 @@ check_args() {
         ;;
     "index")
         info_index
-        ;;
-    "clean")
-        clean_cache
         ;;
     "help")
         help_message
@@ -244,7 +247,6 @@ install_package() {
     local package="$1"
     set +e
 
-    mkdir -p "$WORKING_DIR"
     cd "$WORKING_DIR" || {
         echo -e "${ERROR} could not enter temp path"
         exit 1
@@ -526,14 +528,8 @@ info_index() {
 
 # OCD - Justus0405
 clean_cache() {
-    if [[ -z "$WORKING_DIR" ]]; then
-        echo -e "${ERROR} WORKING_DIR is not set. Stupidity Protection. Exiting."
-        exit 1
-    fi
-
     echo -e "${INFO} Clearing cache..."
     rm -rf "$WORKING_DIR"
-    mkdir -p "$WORKING_DIR"
 }
 
 # Try not to change me every 10 commits challange (Impossible)
@@ -545,11 +541,11 @@ help_message() {
     echo -e "    bpm update"
     echo -e "    bpm upgrade"
     echo -e "    bpm config"
+    echo -e "    bpm clean"
     echo -e "    bpm search  [package]"
     echo -e "    bpm info    [package]"
     echo -e "    bpm list"
     echo -e "    bpm index"
-    echo -e "    bpm clean"
     echo -e "    bpm help"
     echo -e "    bpm version"
     echo -e ""
