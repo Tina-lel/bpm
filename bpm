@@ -162,9 +162,8 @@ add_packages() {
 
     for package in "${packages[@]}"; do
         if [[ -f "$DIRMAIN/index/$package" ]]; then
-            local package_array="${package}_array"
             source "$DIRMAIN/index/$package"
-            REMOTE_VERSION="${!package_array}"
+            REMOTE_VERSION="${!package}"
             if [[ "$VERSION" != "$REMOTE_VERSION" ]]; then
                 echo -e "${SECTION} Updating $package ($VERSION -> $REMOTE_VERSION)"
             else
@@ -401,7 +400,8 @@ update_packagelist() {
             #echo -e "${SORT}/${file} $VERSION"
             #echo -e "    ${DESCRIPTION}"
             #echo ""
-            echo -e "${file}_array=( \"$VERSION\" \"$SORT\" \"$DESCRIPTION\" )"
+            #echo -e "${file}_array=( \"$VERSION\" \"$SORT\" \"$DESCRIPTION\" )"
+            echo -e "${file}=( \"$VERSION\" \"$SORT\" \"$DESCRIPTION\" )"
             rm "$WORKING_DIR/$file.info"
         done > "$DIRMAIN/remote"
 }
@@ -424,9 +424,8 @@ upgrade_packages() {
 
     for package_info in "${packages_info[@]}"; do
         local package="${package_info##*/}"
-        local package_array="${package}_array"
         source "$package_info"
-        REMOTE_VERSION="${!package_array}"
+        REMOTE_VERSION="${!package}"
         if [[ "$VERSION" != "$REMOTE_VERSION" ]]; then
             packages_to_upgrade+=("$package")
         else
