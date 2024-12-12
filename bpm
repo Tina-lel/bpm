@@ -527,8 +527,8 @@ info_index() {
 # OCD - Justus0405
 clean_cache() {
     echo -e "${INFO} Clearing cache..."
-    rm -rf "$HOME/.cache/bpm/"
-    mkdir -p "$HOME/.cache/bpm"
+    rm -rf "$WORKING_DIR"
+    mkdir -p "$WORKING_DIR"
 }
 
 # Try not to change me every 10 commits challange (Impossible)
@@ -544,6 +544,7 @@ help_message() {
     echo -e "    bpm info    [package]"
     echo -e "    bpm list"
     echo -e "    bpm index"
+    echo -e "    bpm clean"
     echo -e "    bpm help"
     echo -e "    bpm version"
     echo -e ""

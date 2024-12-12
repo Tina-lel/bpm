@@ -46,6 +46,7 @@ operations:
     bpm info    [package]
     bpm list
     bpm index
+    bpm clean
     bpm help
     bpm version
 
