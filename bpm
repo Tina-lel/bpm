@@ -96,7 +96,8 @@ check_args() {
         ;;
     "upgrade")
         exec_conf
-        update_packagelist
+        #update_packagelist
+        check_packagelist
         upgrade_packages
         ;;
     "config")
@@ -152,6 +153,8 @@ add_packages() {
         exit 1
     fi
 
+    source "$DIRMAIN/remote"
+
     local packages=("$@")
     local packages_size=0
     local packages_size_final=0
@@ -159,8 +162,9 @@ add_packages() {
 
     for package in "${packages[@]}"; do
         if [[ -f "$DIRMAIN/index/$package" ]]; then
+            local package_array="${package}_array"
             source "$DIRMAIN/index/$package"
-            REMOTE_VERSION=$(cat $DIRMAIN/remote | grep $package | cut -d " " -f2)
+            REMOTE_VERSION="${!package_array}"
             if [[ "$VERSION" != "$REMOTE_VERSION" ]]; then
                 echo -e "${SECTION} Updating $package ($VERSION -> $REMOTE_VERSION)"
             else
@@ -287,6 +291,7 @@ install_package() {
     echo "INSTALLED_FILES=(${INSTALLED_FILES[*]})" >"$DIRMAIN/index/$package"
     echo "ROOT_FOR_INSTALL=$ROOT_FOR_INSTALL" >>"$DIRMAIN/index/$package"
     echo "VERSION=$VERSION" >>"$DIRMAIN/index/$package"
+    echo "SORT=$SORT" >>"$DIRMAIN/index/$package"
     echo "SIZE=$SIZE" >>"$DIRMAIN/index/$package"
 
     echo -e "${INFO} Cleaning up...\n"
@@ -393,9 +398,10 @@ update_packagelist() {
             DESCRIPTION=$(cat "$WORKING_DIR/$file.info" | grep -m 1 '^DESCRIPTION=' | sed -e 's/DESCRIPTION="//' -e 's/"$//')
             #echo -e "${BOLD}${SORT}/${file} ${GRAY}$VERSION${ENDCOLOR}"
             #echo -e "${GRAY}    ${DESCRIPTION}${ENDCOLOR}"
-            echo -e "${SORT}/${file} $VERSION"
-            echo -e "    ${DESCRIPTION}"
-            echo ""
+            #echo -e "${SORT}/${file} $VERSION"
+            #echo -e "    ${DESCRIPTION}"
+            #echo ""
+            echo -e "${file}_array=( \"$VERSION\" \"$SORT\" \"$DESCRIPTION\" )"
             rm "$WORKING_DIR/$file.info"
         done > "$DIRMAIN/remote"
 }
@@ -410,14 +416,17 @@ upgrade_packages() {
 
     echo -e "${INFO} Checking for updates"
 
+    source "$DIRMAIN/remote"
+
     local packages_info=($DIRMAIN/index/*)
     local packages_to_upgrade=()
     local package_amount=${#packages_to_upgrade[@]}
 
     for package_info in "${packages_info[@]}"; do
         local package="${package_info##*/}"
+        local package_array="${package}_array"
         source "$package_info"
-        REMOTE_VERSION=$(cat $DIRMAIN/remote | grep $package | cut -d " " -f2)
+        REMOTE_VERSION="${!package_array}"
         if [[ "$VERSION" != "$REMOTE_VERSION" ]]; then
             packages_to_upgrade+=("$package")
         else
@@ -462,7 +471,7 @@ search_package() {
 
     echo -e "${INFO} Last updated on $(date -r $DIRMAIN/remote  "+%Y-%m-%d / %H:%M:%S")"
 
-    cat "$DIRMAIN/remote" | grep -i -A1 -B1 "$package"
+    cat "$DIRMAIN/remote" | grep -i "$package"
 }
 
 # Checks if the first passed argument is empty if not then proceed
