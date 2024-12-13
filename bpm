@@ -39,7 +39,7 @@ export INFO="${GRAY}[${CYAN}i${GRAY}]${ENDCOLOR}"
 
 # FUNCTIONS
 
-# Creates config in case it doesnt exist
+# Creates essential directories and files in case they dont exist
 create_conf() {
     if [[ ! -d "$DIRMAIN" ]]; then
         mkdir -p "$DIRMAIN"
@@ -150,8 +150,8 @@ check_args() {
 # Then checks if in a for loop for each package if it is available in the given repo using
 # generic html status codes
 #
-# Asks kindly for consent and displays the amount and names of the packages that are about
-# to be installed
+# Asks kindly for consent and displays the amount, names and total net size of the packages
+# that are about to be installed
 #
 # If confirmed passes every package in the array to the install_package function seperatly
 add_packages() {
@@ -288,9 +288,9 @@ install_package() {
     echo -e "${INFO} Installing package..."
     if [[ "$ROOT_FOR_INSTALL" == "true" ]]; then
         # this might be a security vulnurability, but its better than before xd
-        if command -v doas 2>&1 >/dev/null ; then
+        if command -v doas 2>&1 >/dev/null; then
             doas bash -c "$(declare); INSTALL_PKG" 2>/dev/null
-        elif command -v sudo 2>&1 >/dev/null ; then
+        elif command -v sudo 2>&1 >/dev/null; then
             sudo bash -c "$(declare); INSTALL_PKG" 2>/dev/null
         fi
     else
@@ -382,9 +382,9 @@ remove_package() {
         for file_del in "${INSTALLED_FILES[@]}"; do
             echo -e "${WARNING} Deleting $file_del"
             # Does not work with doas ;)
-            if command -v doas 2>&1 >/dev/null ; then
+            if command -v doas 2>&1 >/dev/null; then
                 doas rm -rf "$file_del"
-            elif command -v sudo 2>&1 >/dev/null ; then
+            elif command -v sudo 2>&1 >/dev/null; then
                 sudo rm -rf "$file_del"
             fi
         done
@@ -399,8 +399,9 @@ remove_package() {
     rm -rf "$DIRMAIN/index/$package"
 }
 
-# CHANGEME
-
+# This is quite something.
+# Uses curl to get every .info file from the repo and proccesses the VERSION, SORT and DESCRIPTION
+# and puts them in an array inside the remote file
 update_packagelist() {
     echo -e "${INFO} Refreshing local remote list"
     curl --silent "$REPO/info"/ | grep -o 'href=".*\.info">' | sed -e "s/href=\"//g" -e 's/\.info">//g' |
@@ -420,8 +421,27 @@ update_packagelist() {
         done >"$DIRMAIN/remote"
 }
 
-# CHANGEME
+# Checks if the user as a local packagelist for the specified repo
+check_packagelist() {
+    if [[ ! -f "$DIRMAIN/remote" ]]; then
+        echo -e "${ERROR} please run \"bpm update\" first"
+        exit 1
+    fi
+}
 
+# First checks if there are any occurences inside the index folder of the working
+# directory which stores information about every installed package
+# Then it sources the remote file which contains every package and info about the
+# specified repo
+#
+# Then it processes every pockage each in a for loop with the array inside the index
+# with the array inside the remote
+# The two versions inside the array get compared and if they are not the same, the
+# package name gets added to the packages_to_upgrade array
+# (Couldnt explain this better)
+#
+# Then the packages_to_upgrade array just passes every name to the add_packages()
+# functions which installs them
 upgrade_packages() {
     if [[ -z "$(ls -A $DIRMAIN/index/)" ]]; then
         echo -e "${ERROR} No packages installed"
@@ -440,6 +460,7 @@ upgrade_packages() {
         local package="${package_info##*/}"
         source "$package_info"
         REMOTE_VERSION="${!package}"
+        # FIXME: this needs to be rewritten to PACKAGE_VERSION
         if [[ "$VERSION" != "$REMOTE_VERSION" ]]; then
             packages_to_upgrade+=("$package")
         else
@@ -454,26 +475,17 @@ upgrade_packages() {
     fi
 }
 
-# CHANGEME
-
-check_packagelist() {
-    if [[ ! -f "$DIRMAIN/remote" ]]; then
-        echo -e "${ERROR} please run \"bpm update\" first"
-        exit 1
-    fi
+# Clear the bpm cache in case something went wrong or you just
+# suffer from severe OCD
+clean_cache() {
+    echo -e "${INFO} Clearing cache..."
+    rm -rf "$WORKING_DIR"
 }
-
-# CHANGEME
 
 # Checks if the first passed argument is empty if not then proceed
 #
-# This uses curl to get the list of items in that folder
-# using generic html, then it searches for every file having the .info extention
-# after that strips the href and file extention for display,
-# then the output just gets cut by grep and only the searched package will be displayed
-# if a package was found the script looks inside
-# the .info file of the file that was processed and
-# picks out everything inside the DESCRIPTION variable to print below
+# This uses cat and grep to search a certain package by name or description inside
+# the remote folder provided by the update_packagelist() function
 search_package() {
     if [[ $1 == "" ]]; then
         echo -e "${ERROR} no package specified."
@@ -508,18 +520,8 @@ info_package() {
     curl --silent "$REPO/info/$package.info"
 }
 
-# CHANGEME
-
-# List all files inside the /info directory of your repo
-# The containing files should all have the .info extention
-#
-# This uses curl to get the list of items in that folder
-# using generic html, then it searches for every file having the .info extention
-# after that strips the href and file extention for display,
-# after one href has ben formatted the script looks inside
-# the .info file of the file that was processed and
-# picks out everything inside the DESCRIPTION variable to print below
-# Then the cycle continues for every package
+# List all packages provided by the update_packagelist() function
+# inside the remote folder of the working directory
 info_packagelist() {
     echo -e "${INFO} Last updated on $(date -r $DIRMAIN/remote "+%Y-%m-%d / %H:%M:%S\n")"
     cat "$DIRMAIN/remote"
@@ -532,12 +534,6 @@ info_packagelist() {
 info_index() {
     echo -e "${INFO} Listing installed Packages\n"
     ls -1 "$DIRMAIN/index"
-}
-
-# OCD - Justus0405
-clean_cache() {
-    echo -e "${INFO} Clearing cache..."
-    rm -rf "$WORKING_DIR"
 }
 
 # Try not to change me every 10 commits challange (Impossible)
