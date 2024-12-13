@@ -482,21 +482,55 @@ clean_cache() {
     rm -rf "$WORKING_DIR"
 }
 
+# This function lists all packages from the remote file in a fancy way
+#
 # Checks if the first passed argument is empty if not then proceed
 #
-# This uses cat and grep to search a certain package by name or description inside
-# the remote folder provided by the update_packagelist() function
+# Verify that a search term is provided if not return an error
+# Print the last updated timestamp of the remote file
+# Loop through each line in the file ->
+# Skip empty lines
+# Parse the package name, version, repo, and description by splitting the line
+# Remove unnecessary characters (parentheses and quotes)
+# Check if the search term matches the package name or description
+# If a match is found, format and display the details
 search_package() {
-    if [[ $1 == "" ]]; then
+    if [[ -z "$1" ]]; then
         echo -e "${ERROR} no package specified."
-        exit 1
+        return 1
     fi
 
-    local package="$1"
+    local search_term="$1"
 
     echo -e "${INFO} Last updated on $(date -r $DIRMAIN/remote "+%Y-%m-%d / %H:%M:%S")"
 
-    cat "$DIRMAIN/remote" | grep -i "$package"
+    # Search through the remote file
+    while IFS= read -r line; do
+        # Skip empty lines
+        [[ -z "$line" ]] && continue
+
+        local package_name
+        local version
+        local repo
+        local description
+
+        # Parse the package details by splitting the line manually
+        package_name="${line%%=*}"
+        local content="${line#*=}"
+
+        # Remove surrounding parentheses and quotes
+        content=${content#*(}
+        content=${content%)}}
+
+        # Split the content into components
+        IFS='"' read -r _ version _ repo _ description _ <<<"$content"
+
+        # Check if the search term matches the package name or description
+        if [[ "$package_name" =~ $search_term || "$description" =~ $search_term ]]; then
+            echo -e "${repo}/${package_name} ${version}"
+            echo -e "    ${description}"
+        fi
+    done <"$DIRMAIN/remote"
 }
 
 # Checks if the first passed argument is empty if not then proceed
@@ -522,9 +556,41 @@ info_package() {
 
 # List all packages provided by the update_packagelist() function
 # inside the remote folder of the working directory
+#
+# Loop through each line in the file ->
+# Skip empty lines
+# Parse the package name, version, repo, and description by splitting the line
+# Remove unnecessary characters (parentheses and quotes)
+# Format and display the parsed details
 info_packagelist() {
     echo -e "${INFO} Last updated on $(date -r $DIRMAIN/remote "+%Y-%m-%d / %H:%M:%S\n")"
-    cat "$DIRMAIN/remote"
+
+    # Loop through each line in the remote file
+    while IFS= read -r line; do
+        # Skip empty lines
+        [[ -z "$line" ]] && continue
+
+        local package_name
+        local version
+        local repo
+        local description
+
+        # Parse the package details by splitting the line manually
+        package_name="${line%%=*}"
+        local content="${line#*=}"
+
+        # Remove surrounding parentheses and quotes
+        content=${content#*(}
+        content=${content%)}}
+
+        # Split the content into components
+        IFS='"' read -r _ version _ repo _ description _ <<<"$content"
+
+        # Print the formatted output
+        echo -e "${repo}/${package_name} ${version}"
+        echo -e "    ${description}"
+
+    done <"$DIRMAIN/remote"
 }
 
 # List all the folders in a list inside the index folder
