@@ -288,7 +288,11 @@ install_package() {
     echo -e "${INFO} Installing package..."
     if [[ "$ROOT_FOR_INSTALL" == "true" ]]; then
         # this might be a security vulnurability, but its better than before xd
-        sudo bash -c "$(declare); INSTALL_PKG" 2>/dev/null
+        if command -v doas 2>&1 >/dev/null ; then
+            doas bash -c "$(declare); INSTALL_PKG" 2>/dev/null
+        elif command -v sudo 2>&1 >/dev/null ; then
+            sudo bash -c "$(declare); INSTALL_PKG" 2>/dev/null
+        fi
     else
         INSTALL_PKG
     fi
