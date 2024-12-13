@@ -382,7 +382,11 @@ remove_package() {
         for file_del in "${INSTALLED_FILES[@]}"; do
             echo -e "${WARNING} Deleting $file_del"
             # Does not work with doas ;)
-            sudo rm -rf "$file_del"
+            if command -v doas 2>&1 >/dev/null ; then
+                doas rm -rf "$file_del"
+            elif command -v sudo 2>&1 >/dev/null ; then
+                sudo rm -rf "$file_del"
+            fi
         done
     else
         for file_del in "${INSTALLED_FILES[@]}"; do
