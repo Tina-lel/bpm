@@ -23,19 +23,19 @@ case "$1" in
 
         echo -e "Writing $i.info"
 
-        echo "DESCRIPTION=\"$DESCRIPTION\"" > "../pkgs/info/$i.info"
-        echo "VERSION=\"$VERSION\"" >> "../pkgs/info/$i.info"
-        echo "SORT=\"$SORT\"" >> "../pkgs/info/$i.info"
-        echo "SIZE=\"$(du --apparent-size -hs --bytes ../pkgs/$SORT/$i.tar.gz | cut -f1)\"" >> "../pkgs/info/$i.info"
-        echo "SIZE_EXTRACT=\"$(du --apparent-size -hs --bytes $i | cut -f1)\"" >> "../pkgs/info/$i.info"
-        echo "DEPENDENCIES=\"$DEPENDENCIES\"" >> "../pkgs/info/$i.info"
-        echo "DOWNLOAD=\"$DOWNLOAD\"" >> "../pkgs/info/$i.info"
-        echo "COMPILE=\"$COMPILE\"" >> "../pkgs/info/$i.info"
-        echo "ROOT_FOR_INSTALL=\"$ROOT_FOR_INSTALL\"" >> "../pkgs/info/$i.info"
-        echo "INSTALLED_FILES=(${INSTALLED_FILES[*]})" >> "../pkgs/info/$i.info"
+        echo "DESCRIPTION=\"$DESCRIPTION\"" >"../pkgs/info/$i.info"
+        echo "VERSION=\"$VERSION\"" >>"../pkgs/info/$i.info"
+        echo "SORT=\"$SORT\"" >>"../pkgs/info/$i.info"
+        echo "SIZE=\"$(du --apparent-size -hs --bytes ../pkgs/$SORT/$i.tar.gz | cut -f1)\"" >>"../pkgs/info/$i.info"
+        echo "SIZE_EXTRACT=\"$(du --apparent-size -hs --bytes $i | cut -f1)\"" >>"../pkgs/info/$i.info"
+        echo "DEPENDENCIES=\"$DEPENDENCIES\"" >>"../pkgs/info/$i.info"
+        echo "DOWNLOAD=\"$DOWNLOAD\"" >>"../pkgs/info/$i.info"
+        echo "COMPILE=\"$COMPILE\"" >>"../pkgs/info/$i.info"
+        echo "ROOT_FOR_INSTALL=\"$ROOT_FOR_INSTALL\"" >>"../pkgs/info/$i.info"
+        echo "INSTALLED_FILES=(${INSTALLED_FILES[*]})" >>"../pkgs/info/$i.info"
 
         md5=($(md5sum "../pkgs/$SORT/$i.tar.gz"))
-        echo "$md5  $i.tar.gz" >> "../pkgs/info/$i.info"
+        echo "$md5  $i.tar.gz" >>"../pkgs/info/$i.info"
     done
     exit 0
     ;;
@@ -78,16 +78,16 @@ tar -czf "../pkgs/$SORT/$1.tar.gz" "$1"
 
 echo -e "Writing $1.info"
 
-echo "DESCRIPTION=\"$DESCRIPTION\"" > "../pkgs/info/$1.info"
-echo "VERSION=\"$VERSION\"" >> "../pkgs/info/$1.info"
-echo "SORT=\"$SORT\"" >> "../pkgs/info/$1.info"
-echo "SIZE=\"$(du --apparent-size -hs --bytes ../pkgs/$SORT/$1.tar.gz | cut -f1)\"" >> "../pkgs/info/$1.info"
-echo "SIZE_EXTRACT=\"$(du --apparent-size -hs --bytes $1 | cut -f1)\"" >> "../pkgs/info/$1.info"
-echo "DEPENDENCIES=\"$DEPENDENCIES\"" >> "../pkgs/info/$1.info"
-echo "DOWNLOAD=\"$DOWNLOAD\"" >> "../pkgs/info/$1.info"
-echo "COMPILE=\"$COMPILE\"" >> "../pkgs/info/$1.info"
-echo "ROOT_FOR_INSTALL=\"$ROOT_FOR_INSTALL\"" >> "../pkgs/info/$1.info"
-echo "INSTALLED_FILES=(${INSTALLED_FILES[@]})" >> "../pkgs/info/$1.info"
+echo "DESCRIPTION=\"$DESCRIPTION\"" >"../pkgs/info/$1.info"
+echo "VERSION=\"$VERSION\"" >>"../pkgs/info/$1.info"
+echo "SORT=\"$SORT\"" >>"../pkgs/info/$1.info"
+echo "SIZE=\"$(du --apparent-size -hs --bytes ../pkgs/$SORT/$1.tar.gz | cut -f1)\"" >>"../pkgs/info/$1.info"
+echo "SIZE_EXTRACT=\"$(du --apparent-size -hs --bytes $1 | cut -f1)\"" >>"../pkgs/info/$1.info"
+echo "DEPENDENCIES=\"$DEPENDENCIES\"" >>"../pkgs/info/$1.info"
+echo "DOWNLOAD=\"$DOWNLOAD\"" >>"../pkgs/info/$1.info"
+echo "COMPILE=\"$COMPILE\"" >>"../pkgs/info/$1.info"
+echo "ROOT_FOR_INSTALL=\"$ROOT_FOR_INSTALL\"" >>"../pkgs/info/$1.info"
+echo "INSTALLED_FILES=(${INSTALLED_FILES[*]})" >>"../pkgs/info/$1.info"
 
 md5=($(md5sum "../pkgs/$SORT/$1.tar.gz"))
-echo "$md5  $1.tar.gz" >> "../pkgs/info/$1.info"
+echo "$md5  $1.tar.gz" >>"../pkgs/info/$1.info"

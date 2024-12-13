@@ -484,8 +484,6 @@ clean_cache() {
 
 # This function lists all packages from the remote file in a fancy way
 #
-# Checks if the first passed argument is empty if not then proceed
-#
 # Verify that a search term is provided if not return an error
 # Print the last updated timestamp of the remote file
 # Loop through each line in the file ->
