@@ -52,6 +52,10 @@ create_conf() {
         echo "REPO=(\"\")" >>"$DIRMAIN/bpm.conf"
         echo "SORT=(\"\")" >>"$DIRMAIN/bpm.conf"
         echo "WORKING_DIR=\"$HOME/.cache/bpm\"" >>"$DIRMAIN/bpm.conf"
+        echo "" >>"$DIRMAIN/bpm.conf"
+        echo "COMMON_FLAGS=\"-g -O3 -march=native -pipe\"" >>"$DIRMAIN/bpm.conf"
+        echo "MAKEFLAGS=\"-j$(nproc)\"" >>"$DIRMAIN/bpm.conf"
+        echo "CFLAGS=\"\${COMMON_FLAGS}\"" >>"$DIRMAIN/bpm.conf"
     fi
 }
 
@@ -284,6 +288,8 @@ install_package() {
     # Checks if COMPILE is true in case the source code must be compiled
     if [[ "$COMPILE" == "true" ]]; then
         echo -e "${INFO} Compiling source..."
+        echo -e "COMMON: ${COMMON_FLAGS}"
+        echo -e "CFLAGS: ${CFLAGS}"
         COMPILE_SRC
     fi
 
