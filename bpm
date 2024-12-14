@@ -288,8 +288,6 @@ install_package() {
     # Checks if COMPILE is true in case the source code must be compiled
     if [[ "$COMPILE" == "true" ]]; then
         echo -e "${INFO} Compiling source..."
-        echo -e "COMMON: ${COMMON_FLAGS}"
-        echo -e "CFLAGS: ${CFLAGS}"
         COMPILE_SRC
     fi
 
