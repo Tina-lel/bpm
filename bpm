@@ -54,8 +54,11 @@ create_conf() {
         echo "WORKING_DIR=\"$HOME/.cache/bpm\"" >>"$DIRMAIN/bpm.conf"
         echo "" >>"$DIRMAIN/bpm.conf"
         echo "COMMON_FLAGS=\"-g -O3 -march=native -pipe\"" >>"$DIRMAIN/bpm.conf"
-        echo "MAKEFLAGS=\"-j$(nproc)\"" >>"$DIRMAIN/bpm.conf"
         echo "CFLAGS=\"\${COMMON_FLAGS}\"" >>"$DIRMAIN/bpm.conf"
+        echo "CPPFLAGS=\"\${COMMON_FLAGS}\"" >>"$DIRMAIN/bpm.conf"
+        echo "CXXFLAGS=\"\${COMMON_FLAGS}\"" >>"$DIRMAIN/bpm.conf"
+        echo "" >>"$DIRMAIN/bpm.conf"
+        echo "MAKEFLAGS=\"-j$(nproc)\"" >>"$DIRMAIN/bpm.conf"
     fi
 }
 
