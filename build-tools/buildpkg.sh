@@ -6,7 +6,7 @@ case "$1" in
 "ALL")
     echo -e "Building all packages\n"
     mkdir -p "pkgs"
-    mkdir -p "pkgs/info"
+    mkdir -p "tmp"
     cd "src_pkgs" || {
         echo "Error: could not find src_pkgs folder"
         exit 1
@@ -14,6 +14,7 @@ case "$1" in
     for i in *; do
         source "$i/pkg_info"
 
+        mkdir -p "../tmp/$SORT"
         mkdir -p "../pkgs/$SORT"
 
         echo -e "Building $i"
@@ -23,25 +24,38 @@ case "$1" in
 
         echo -e "Writing $i.info"
 
-        echo "DESCRIPTION=\"$DESCRIPTION\"" >"../pkgs/info/$i.info"
-        echo "VERSION=\"$VERSION\"" >>"../pkgs/info/$i.info"
-        echo "SORT=\"$SORT\"" >>"../pkgs/info/$i.info"
-        echo "SIZE=\"$(du --apparent-size -hs --bytes ../pkgs/$SORT/$i.tar.gz | cut -f1)\"" >>"../pkgs/info/$i.info"
-        echo "SIZE_EXTRACT=\"$(du --apparent-size -hs --bytes $i | cut -f1)\"" >>"../pkgs/info/$i.info"
-        echo "DEPENDENCIES=\"$DEPENDENCIES\"" >>"../pkgs/info/$i.info"
-        echo "DOWNLOAD=\"$DOWNLOAD\"" >>"../pkgs/info/$i.info"
-        echo "COMPILE=\"$COMPILE\"" >>"../pkgs/info/$i.info"
-        echo "ROOT_FOR_INSTALL=\"$ROOT_FOR_INSTALL\"" >>"../pkgs/info/$i.info"
-        echo "INSTALLED_FILES=(${INSTALLED_FILES[*]})" >>"../pkgs/info/$i.info"
+        echo "DESCRIPTION=\"$DESCRIPTION\"" >"../tmp/$SORT/$i.info"
+        echo "VERSION=\"$VERSION\"" >>"../tmp/$SORT/$i.info"
+        echo "SORT=\"$SORT\"" >>"../tmp/$SORT/$i.info"
+        echo "SIZE=\"$(du --apparent-size -hs --bytes ../pkgs/$SORT/$i.tar.gz | cut -f1)\"" >>"../tmp/$SORT/$i.info"
+        echo "SIZE_EXTRACT=\"$(du --apparent-size -hs --bytes $i | cut -f1)\"" >>"../tmp/$SORT/$i.info"
+        echo "DEPENDENCIES=\"$DEPENDENCIES\"" >>"../tmp/$SORT/$i.info"
+        echo "DOWNLOAD=\"$DOWNLOAD\"" >>"../tmp/$SORT/$i.info"
+        echo "COMPILE=\"$COMPILE\"" >>"../tmp/$SORT/$i.info"
+        echo "ROOT_FOR_INSTALL=\"$ROOT_FOR_INSTALL\"" >>"../tmp/$SORT/$i.info"
+        echo "INSTALLED_FILES=(${INSTALLED_FILES[*]})" >>"../tmp/$SORT/$i.info"
 
         md5=($(md5sum "../pkgs/$SORT/$i.tar.gz"))
-        echo "$md5  $i.tar.gz" >>"../pkgs/info/$i.info"
+        echo "$md5  $i.tar.gz" >>"../tmp/$SORT/$i.info"
     done
+
+    cd "../tmp" || {
+        echo "Error: could not find src_pkgs folder"
+        exit 1
+    }
+
+    for i in *; do
+        echo -e "Creating bpminfo for sort $i"
+        tar -czf "../pkgs/$i/BPMINFO.tar.gz" $i/*
+    done
+
     exit 0
     ;;
 "CLEAN")
     echo -e "Deleting pkg folder"
     rm -rf pkgs
+    echo -e "Deleting tmp folder"
+    rm -rf tmp
     exit 0
     ;;
 esac

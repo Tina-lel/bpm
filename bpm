@@ -44,11 +44,13 @@ create_conf() {
     if [[ ! -d "$DIRMAIN" ]]; then
         mkdir -p "$DIRMAIN"
         mkdir -p "$DIRMAIN/index"
+        mkdir -p "$DIRMAIN/remote"
         touch "$DIRMAIN/bpm.conf"
 
         echo "# Created by bpm on $(date '+%Y\%m\%d')" >>"$DIRMAIN/bpm.conf"
         echo "" >>"$DIRMAIN/bpm.conf"
-        echo "REPO=\"\"" >>"$DIRMAIN/bpm.conf"
+        echo "REPO=(\"\")" >>"$DIRMAIN/bpm.conf"
+        echo "SORT=(\"\")" >>"$DIRMAIN/bpm.conf"
         echo "WORKING_DIR=\"$HOME/.cache/bpm\"" >>"$DIRMAIN/bpm.conf"
     fi
 }
@@ -69,7 +71,6 @@ exec_conf() {
     fi
 
     mkdir -p "$WORKING_DIR"
-
 }
 
 # gets passed all starting arguments in an array at # PROGRAM START
@@ -85,6 +86,7 @@ check_args() {
     case $1 in
     "add")
         exec_conf
+        check_packagelist
         shift
         add_packages "$@"
         ;;
@@ -112,12 +114,13 @@ check_args() {
         ;;
     "search")
         exec_conf
-        shift
         check_packagelist
+        shift
         search_package "$1"
         ;;
     "info")
         exec_conf
+        check_packagelist
         shift
         info_package "$1"
         ;;
@@ -160,7 +163,7 @@ add_packages() {
         exit 1
     fi
 
-    source "$DIRMAIN/remote"
+    source "$DIRMAIN/remote_info"
 
     local packages=("$@")
     local packages_size=0
@@ -179,15 +182,13 @@ add_packages() {
         fi
     done
 
-    # This checks wether or not the specified package name is available at the
-    # remote repo via an http code (200 means downloadable, so continue)
     for package_check in "${packages[@]}"; do
-        AVAILABILITY=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/info/$package_check.info")
-        if [[ "$AVAILABILITY" != "200" ]]; then
-            echo -e "${ERROR} Cant download package info for '$package_check'"
+
+        cp $DIRMAIN/remote/$package_check.info "$WORKING_DIR/$package_check.info" >/dev/null 2>&1
+        if [[ "$?" != 0 ]]; then
+            echo -e "${ERROR} Cant get package info for $package_check"
             exit 1
         else
-            curl -s -o "$WORKING_DIR/$package_check.info" "$REPO/info/$package_check.info"
             source "$WORKING_DIR/$package_check.info" >/dev/null 2>&1
             packages_size=$(("$packages_size" + "$SIZE"))
             packages_size_final=$(("$packages_size_final" + "$SIZE_EXTRACT"))
@@ -203,7 +204,7 @@ add_packages() {
     read -rp "Proceed with installation? [Y/n] " confirm
     case "$confirm" in
     [nN])
-        rm $WORKING_DIR/*.info
+        rm -f $WORKING_DIR/*.info
         echo -e "${RED}Aborted.${ENDCOLOR}"
         exit 0
         ;;
@@ -256,7 +257,8 @@ install_package() {
     source "$package.info" >/dev/null 2>&1
     curl -s -o "$package.tar.gz" "$REPO/$SORT/$package.tar.gz"
 
-    # Dont forget to install core-utils for your beloved alpine Tina :3
+    # Dont forget to install coreutils for your beloved alpine Tina :3
+    # yea i fukin did
     echo -e "${INFO} Verifying checksum..."
     cat "$package.info" | tail -n 1 | md5sum --quiet -c - || {
         echo -e "${ERROR} Checksum missmatch"
@@ -403,27 +405,33 @@ remove_package() {
 # Uses curl to get every .info file from the repo and proccesses the VERSION, SORT and DESCRIPTION
 # and puts them in an array inside the remote file
 update_packagelist() {
-    echo -e "${INFO} Refreshing local remote list"
-    curl --silent "$REPO/info"/ | grep -o 'href=".*\.info">' | sed -e "s/href=\"//g" -e 's/\.info">//g' |
-        while read -r file; do
-            curl --silent -o "$WORKING_DIR/$file.info" "$REPO/info/$file.info"
-            VERSION=$(cat "$WORKING_DIR/$file.info" | grep -m 1 '^VERSION=' | sed -e 's/VERSION="//' -e 's/"$//')
-            SORT=$(cat "$WORKING_DIR/$file.info" | grep -m 1 '^SORT=' | sed -e 's/SORT="//' -e 's/"$//')
-            DESCRIPTION=$(cat "$WORKING_DIR/$file.info" | grep -m 1 '^DESCRIPTION=' | sed -e 's/DESCRIPTION="//' -e 's/"$//')
-            #echo -e "${BOLD}${SORT}/${file} ${GRAY}$VERSION${ENDCOLOR}"
-            #echo -e "${GRAY}    ${DESCRIPTION}${ENDCOLOR}"
-            #echo -e "${SORT}/${file} $VERSION"
-            #echo -e "    ${DESCRIPTION}"
-            #echo ""
-            #echo -e "${file}_array=( \"$VERSION\" \"$SORT\" \"$DESCRIPTION\" )"
-            echo -e "${file}=( \"$VERSION\" \"$SORT\" \"$DESCRIPTION\" )"
-            rm "$WORKING_DIR/$file.info"
-        done >"$DIRMAIN/remote"
+    set -e
+    echo -e "${INFO} Refreshing local remote info"
+    cd "$DIRMAIN/remote" || {
+        echo -e "failed to change dir"
+        exit 1
+    }
+
+    rm -rf *
+
+    for remote_repo in "${REPO[@]}"; do
+        for remote_sort in "${SORT[@]}"; do
+            curl --output - "$remote_repo/$remote_sort/BPMINFO.tar.gz" | tar -xzf - --strip-components=1
+        done
+    done
+
+    echo -e "${INFO} Writing remote file"
+    for info in *; do
+        VERSION=$(cat "$info" | grep -m 1 '^VERSION=' | sed -e 's/VERSION="//' -e 's/"$//')
+        SORT=$(cat "$info" | grep -m 1 '^SORT=' | sed -e 's/SORT="//' -e 's/"$//')
+        DESCRIPTION=$(cat "$info" | grep -m 1 '^DESCRIPTION=' | sed -e 's/DESCRIPTION="//' -e 's/"$//')
+        echo -e "${info%.*}=( \"$VERSION\" \"$SORT\" \"$DESCRIPTION\" )"
+    done >"$DIRMAIN/remote_info"
 }
 
 # Checks if the user as a local packagelist for the specified repo
 check_packagelist() {
-    if [[ ! -f "$DIRMAIN/remote" ]]; then
+    if [[ ! -f "$DIRMAIN/remote_info" ]]; then
         echo -e "${ERROR} please run \"bpm update\" first"
         exit 1
     fi
@@ -450,7 +458,7 @@ upgrade_packages() {
 
     echo -e "${INFO} Checking for updates"
 
-    source "$DIRMAIN/remote"
+    source "$DIRMAIN/remote_info"
 
     local packages_info=($DIRMAIN/index/*)
     local packages_to_upgrade=()
@@ -528,7 +536,7 @@ search_package() {
             echo -e "${repo}/${package_name} ${version}"
             echo -e "    ${description}"
         fi
-    done <"$DIRMAIN/remote"
+    done <"$DIRMAIN/remote_info"
 }
 
 # Checks if the first passed argument is empty if not then proceed
@@ -543,13 +551,13 @@ info_package() {
     fi
     local package="$1"
 
-    AVAILABILITY_INFO=$(curl -o /dev/null --silent -Iw "%{http_code}" "$REPO/info/$package.info")
-    if [[ "$AVAILABILITY_INFO" != "200" ]]; then
-        echo -e "${ERROR} Cant download info for '$package'"
+    if [[ ! -f "$DIRMAIN/remote/$package.info" ]]; then
+        echo -e "${ERROR} Cant get package info for $package"
         exit 1
     fi
+
     echo -e "${INFO} Info for $package"
-    curl --silent "$REPO/info/$package.info"
+    cat "$DIRMAIN/remote/$package.info"
 }
 
 # List all packages provided by the update_packagelist() function
@@ -561,7 +569,7 @@ info_package() {
 # Remove unnecessary characters (parentheses and quotes)
 # Format and display the parsed details
 info_packagelist() {
-    echo -e "${INFO} Last updated on $(date -r $DIRMAIN/remote "+%Y-%m-%d / %H:%M:%S\n")"
+    echo -e "${INFO} Last updated on $(date -r $DIRMAIN/remote_info "+%Y-%m-%d / %H:%M:%S\n")"
 
     # Loop through each line in the remote file
     while IFS= read -r line; do
@@ -588,7 +596,7 @@ info_packagelist() {
         echo -e "${repo}/${package_name} ${version}"
         echo -e "    ${description}"
 
-    done <"$DIRMAIN/remote"
+    done <"$DIRMAIN/remote_info"
 }
 
 # List all the folders in a list inside the index folder
