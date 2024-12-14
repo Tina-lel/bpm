@@ -57,8 +57,9 @@ create_conf() {
         echo "CFLAGS=\"\${COMMON_FLAGS}\"" >>"$DIRMAIN/bpm.conf"
         echo "CPPFLAGS=\"\${COMMON_FLAGS}\"" >>"$DIRMAIN/bpm.conf"
         echo "CXXFLAGS=\"\${COMMON_FLAGS}\"" >>"$DIRMAIN/bpm.conf"
-        echo "" >>"$DIRMAIN/bpm.conf"
         echo "MAKEFLAGS=\"-j$(nproc)\"" >>"$DIRMAIN/bpm.conf"
+        echo "" >>"$DIRMAIN/bpm.conf"
+        echo "RUSTFLAGS=\"--release -j $(nproc)\"" >>"$DIRMAIN/bpm.conf"
     fi
 }
 
