@@ -416,7 +416,9 @@ update_packagelist() {
 
     for remote_repo in "${REPO[@]}"; do
         for remote_sort in "${SORT[@]}"; do
-            curl --output - "$remote_repo/$remote_sort/BPMINFO.tar.gz" | tar -xzf - --strip-components=1
+            echo -ne "$remote_repo/$remote_sort... "
+            curl --silent --output - "$remote_repo/$remote_sort/BPMINFO.tar.gz" | tar -xzf - --strip-components=1
+            echo -e "${SUCCSESS}"
         done
     done
 
