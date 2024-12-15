@@ -334,6 +334,8 @@ install_package() {
     echo "SORT=$SORT" >>"$DIRMAIN/index/$package"
     echo "SIZE=$SIZE" >>"$DIRMAIN/index/$package"
 
+    set +e
+
     # check if compile dependencies were installed
     if [[ "${#COMPILE_DEPENDENCIES[@]}" != 0 ]]; then
         echo -e "${INFO} Removing compile time dependencies"
@@ -362,7 +364,7 @@ depcheck() {
     }
 
     for info in *; do
-        source $info
+        source $info >/dev/null 2>&1
         for package in "${packages[@]}"; do
             if [[ " ${DEPENDENCIES[@]} " =~ [[:space:]]$package[[:space:]] ]]; then
                 echo -e "${WARNING} $info depends on $package"
