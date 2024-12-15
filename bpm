@@ -339,7 +339,9 @@ install_package() {
     # check if compile dependencies were installed
     if [[ "${#COMPILE_DEPENDENCIES[@]}" != 0 ]]; then
         echo -e "${INFO} Removing compile time dependencies"
-        depcheck "${COMPILE_DEPENDENCIES[@]}"
+        for check in "${COMPILE_DEPENDENCIES[@]}"; do
+            depcheck "$check"
+        done
         for package_del in "${safe_packages[@]}"; do
             echo -e "${SECTION} Removing $package_del"
             remove_package "$package_del"
@@ -356,8 +358,6 @@ install_package() {
 
 # check if other programms need a package before removing it
 depcheck() {
-    local packages=("$@")
-
     cd "$DIRMAIN/remote" || {
         echo -e "failed to change dir"
         exit 1
@@ -365,13 +365,11 @@ depcheck() {
 
     for info in *; do
         source $info >/dev/null 2>&1
-        for package in "${packages[@]}"; do
-            if [[ " ${DEPENDENCIES[@]} " =~ [[:space:]]$package[[:space:]] ]]; then
-                echo -e "${WARNING} $info depends on $package"
-            else
-                safe_packages+=("$package")
-            fi
-        done
+        if [[ " ${DEPENDENCIES[@]} " =~ [[:space:]]$1[[:space:]] ]]; then
+            echo -e "${WARNING} $info depends on $package"
+        else
+            safe_packages+=("$1")
+        fi
     done
 }
 
