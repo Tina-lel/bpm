@@ -217,7 +217,7 @@ add_packages() {
             if [[ "${#COMPILE_DEPENDENCIES[@]}" != 0 ]]; then
                 for dep in "${COMPILE_DEPENDENCIES[@]}"; do
                     if [[ ! -f "$DIRMAIN/index/$dep" ]]; then
-                        echo "DEP=\"TRUE\"" | cat - $DIRMAIN/remote/$dep.info >"$WORKING_DIR/$dep.info"
+                        echo "COMP_DEP=\"TRUE\"" | cat - $DIRMAIN/remote/$dep.info >"$WORKING_DIR/$dep.info"
                         packages=("$dep" "${packages[@]}")
                     fi
                 done
@@ -336,7 +336,7 @@ install_package() {
     fi
 
     echo "INSTALLED_FILES=(${INSTALLED_FILES[*]})" >"$DIRMAIN/index/$package"
-    echo "DEPENDENCIES=(${DEPENDENCIES[*]})" >"$DIRMAIN/index/$package"
+    echo "DEPENDENCIES=(${DEPENDENCIES[*]})" >>"$DIRMAIN/index/$package"
     echo "ROOT_FOR_INSTALL=$ROOT_FOR_INSTALL" >>"$DIRMAIN/index/$package"
     echo "VERSION=$VERSION" >>"$DIRMAIN/index/$package"
     echo "SORT=$SORT" >>"$DIRMAIN/index/$package"
