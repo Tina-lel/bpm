@@ -205,13 +205,13 @@ add_packages() {
             if [[ "${#DEPENDENCIES[@]}" != 0 ]]; then
                 packages=("${DEPENDENCIES[@]}" "${packages[@]}")
                 for dep in "${DEPENDENCIES[@]}"; do
-                    cp $DIRMAIN/remote/$dep.info "$WORKING_DIR/$package_check.info"
+                    cp $DIRMAIN/remote/$dep.info "$WORKING_DIR/$dep.info"
                 done
             fi
             if [[ "${#COMPILE_DEPENDENCIES[@]}" != 0 ]]; then
                 packages=("${COMPILE_DEPENDENCIES[@]}" "${packages[@]}")
                 for dep in "${COMPILE_DEPENDENCIES[@]}"; do
-                    cp $DIRMAIN/remote/$dep.info "$WORKING_DIR/$package_check.info"
+                    cp $DIRMAIN/remote/$dep.info "$WORKING_DIR/$dep.info"
                 done
             fi
         fi
