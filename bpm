@@ -177,7 +177,6 @@ add_packages() {
     local packages=("$@")
     local packages_size=0
     local packages_size_final=0
-    local package_amount=${#packages[@]}
 
     for package in "${packages[@]}"; do
         if [[ -f "$DIRMAIN/index/$package" ]]; then
@@ -203,10 +202,16 @@ add_packages() {
             packages_size_final=$(("$packages_size_final" + "$SIZE_EXTRACT"))
 
             # check for dependencies
-            packages=("${DEPENDENCIES[*]}" "${packages[*]}")
-            packages=("${COMPILE_DEPENDENCIES[*]}" "${packages[*]}")
+            if [[ "${#DEPENDENCIES[@]}" != 0 ]]; then
+                packages=("${DEPENDENCIES[@]}" "${packages[@]}")
+            fi
+            if [[ "${#COMPILE_DEPENDENCIES[@]}" != 0 ]]; then
+                packages=("${COMPILE_DEPENDENCIES[@]}" "${packages[@]}")
+            fi
         fi
     done
+
+    local package_amount=${#packages[@]}
 
     echo -e ""
     echo -e "${INFO} Packages ($package_amount): ${packages[*]}"
