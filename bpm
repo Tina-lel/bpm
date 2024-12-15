@@ -382,6 +382,18 @@ del_packages() {
         else
             source "$DIRMAIN/index/$package"
             packages_size=$(("$packages_size" + "$SIZE"))
+
+            cd "$DIRMAIN/index/" || {
+                echo -e "failed to change temp dir"
+                exit 1
+            }
+
+            for info in *; do
+                source "$DIRMAIN/index/$info"
+                if [[ " ${DEPENDENCIES[*]} " =~ [[:space:]]${package}[[:space:]] ]]; then
+                    echo -e "${WARNING} $info depends on $package!"
+                fi
+            done
         fi
     done
 
