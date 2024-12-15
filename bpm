@@ -343,8 +343,10 @@ install_package() {
     echo "SIZE=$SIZE" >>"$DIRMAIN/index/$package"
     if [[ "$COMP_DEP" == "true" ]]; then
         echo "COMP_DEP=\"true\"" >>"$DIRMAIN/index/$package"
+        COMP_DEP=""
     elif [[ "$DEP" == "true" ]]; then
         echo "DEP=\"true\"" >>"$DIRMAIN/index/$package"
+        DEP=""
     fi
 
     echo -e "${INFO} Cleaning up...\n"
