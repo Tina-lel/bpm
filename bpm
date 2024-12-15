@@ -52,6 +52,7 @@ create_conf() {
         echo "REPO=(\"\")" >>"$DIRMAIN/bpm.conf"
         echo "SORT=(\"\")" >>"$DIRMAIN/bpm.conf"
         echo "WORKING_DIR=\"$HOME/.cache/bpm\"" >>"$DIRMAIN/bpm.conf"
+        echo "PROGRESS_BAR=\"true\"" >>"$DIRMAIN/bpm.conf"
         echo "" >>"$DIRMAIN/bpm.conf"
         echo "COMMON_FLAGS=\"-g -O3 -march=native -pipe\"" >>"$DIRMAIN/bpm.conf"
         echo "CFLAGS=\"\${COMMON_FLAGS}\"" >>"$DIRMAIN/bpm.conf"
@@ -263,7 +264,11 @@ install_package() {
 
     echo -e "${INFO} Downloading package..."
     source "$package.info" >/dev/null 2>&1
-    curl -s -o "$package.tar.gz" "$REPO/$SORT/$package.tar.gz"
+    if [[ "$PROGRESS_BAR" == "true" ]]; then
+        curl --progress-bar -o "$package.tar.gz" "$REPO/$SORT/$package.tar.gz"
+    else
+        curl -s -o "$package.tar.gz" "$REPO/$SORT/$package.tar.gz"
+    fi
 
     # Dont forget to install coreutils for your beloved alpine Tina :3
     # yea i fukin did
