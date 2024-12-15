@@ -209,8 +209,7 @@ add_packages() {
             if [[ "${#DEPENDENCIES[@]}" != 0 ]]; then
                 for dep in "${DEPENDENCIES[@]}"; do
                     if [[ ! -f "$DIRMAIN/index/$dep" ]]; then
-                        cp $DIRMAIN/remote/$dep.info "$WORKING_DIR/$dep.info"
-                        echo "DEP=\"TRUE\"" >>"$WORKING_DIR/$dep.info"
+                        echo "DEP=\"TRUE\"" | cat - $DIRMAIN/remote/$dep.info >"$WORKING_DIR/$dep.info"
                         packages=("$dep" "${packages[@]}")
                     fi
                 done
@@ -218,8 +217,7 @@ add_packages() {
             if [[ "${#COMPILE_DEPENDENCIES[@]}" != 0 ]]; then
                 for dep in "${COMPILE_DEPENDENCIES[@]}"; do
                     if [[ ! -f "$DIRMAIN/index/$dep" ]]; then
-                        cp $DIRMAIN/remote/$dep.info "$WORKING_DIR/$dep.info"
-                        echo "COMP_DEP=\"TRUE\"" >>"$WORKING_DIR/$dep.info"
+                        echo "DEP=\"TRUE\"" | cat - $DIRMAIN/remote/$dep.info >"$WORKING_DIR/$dep.info"
                         packages=("$dep" "${packages[@]}")
                     fi
                 done
