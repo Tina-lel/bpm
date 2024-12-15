@@ -201,6 +201,10 @@ add_packages() {
             source "$WORKING_DIR/$package_check.info" >/dev/null 2>&1
             packages_size=$(("$packages_size" + "$SIZE"))
             packages_size_final=$(("$packages_size_final" + "$SIZE_EXTRACT"))
+
+            # check for dependencies
+            packages+=("${DEPENDENCIES[*]}")
+            packages+=("${COMPILE_DEPENDENCIES[*]}")
         fi
     done
 
@@ -313,10 +317,21 @@ install_package() {
     fi
 
     echo "INSTALLED_FILES=(${INSTALLED_FILES[*]})" >"$DIRMAIN/index/$package"
+    echo "DEPENDENCIES=(${DEPENDENCIES[*]})" >"$DIRMAIN/index/$package"
     echo "ROOT_FOR_INSTALL=$ROOT_FOR_INSTALL" >>"$DIRMAIN/index/$package"
     echo "VERSION=$VERSION" >>"$DIRMAIN/index/$package"
     echo "SORT=$SORT" >>"$DIRMAIN/index/$package"
     echo "SIZE=$SIZE" >>"$DIRMAIN/index/$package"
+
+    # check if compile dependencies were installed
+    if [[ "${#COMPILE_DEPENDENCIES[@]}" != 0 ]]; then
+        echo -e "${INFO} Removing compile time dependencies"
+        depcheck "${COMPILE_DEPENDENCIES[@]}"
+        for package_del in "${safe_packages[@]}"; do
+            echo -e "${SECTION} Removing $package_del"
+            remove_package "$package_del"
+        done
+    fi
 
     echo -e "${INFO} Cleaning up...\n"
     cd "$WORKING_DIR" || {
@@ -324,6 +339,27 @@ install_package() {
         exit 1
     }
     rm -rf "$package.tar.gz" "$package.info" "$package"
+}
+
+# check if other programms need a package before removing it
+depcheck() {
+    local packages=("$@")
+
+    cd "$DIRMAIN/remote" || {
+        echo -e "failed to change dir"
+        exit 1
+    }
+
+    for info in *; do
+        source $info
+        for package in "${packages[@]}"; do
+            if [[ " ${DEPENDENCIES[@]} " =~ [[:space:]]$package[[:space:]] ]]; then
+                echo -e "${WARNING} $info depends on $package"
+            else
+                safe_packages+=("$package")
+            fi
+        done
+    done
 }
 
 # Checks if the first passed argument is empty if not then proceed with the next check
