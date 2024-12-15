@@ -203,8 +203,8 @@ add_packages() {
             packages_size_final=$(("$packages_size_final" + "$SIZE_EXTRACT"))
 
             # check for dependencies
-            packages+=("${DEPENDENCIES[*]}")
-            packages+=("${COMPILE_DEPENDENCIES[*]}")
+            packages=("${DEPENDENCIES[*]}" "${packages[*]}")
+            packages=("${COMPILE_DEPENDENCIES[*]}" "${packages[*]}")
         fi
     done
 
