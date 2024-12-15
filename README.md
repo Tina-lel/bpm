@@ -47,6 +47,7 @@ operations:
     bpm list
     bpm index
     bpm clean
+    bpm depclean
     bpm help
     bpm version
 

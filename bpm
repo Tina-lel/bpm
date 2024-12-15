@@ -121,6 +121,10 @@ check_args() {
         exec_conf
         clean_cache
         ;;
+    "depclean")
+        exec_conf
+        clean_comp_deps
+        ;;
     "search")
         exec_conf
         check_packagelist
@@ -203,15 +207,21 @@ add_packages() {
 
             # check for dependencies
             if [[ "${#DEPENDENCIES[@]}" != 0 ]]; then
-                packages=("${DEPENDENCIES[@]}" "${packages[@]}")
                 for dep in "${DEPENDENCIES[@]}"; do
-                    cp $DIRMAIN/remote/$dep.info "$WORKING_DIR/$dep.info"
+                    if [[ ! -f "$DIRMAIN/index/$dep" ]]; then
+                        cp $DIRMAIN/remote/$dep.info "$WORKING_DIR/$dep.info"
+                        echo "DEP=\"TRUE\"" >>"$WORKING_DIR/$dep.info"
+                        packages=("$dep" "${packages[@]}")
+                    fi
                 done
             fi
             if [[ "${#COMPILE_DEPENDENCIES[@]}" != 0 ]]; then
-                packages=("${COMPILE_DEPENDENCIES[@]}" "${packages[@]}")
                 for dep in "${COMPILE_DEPENDENCIES[@]}"; do
-                    cp $DIRMAIN/remote/$dep.info "$WORKING_DIR/$dep.info"
+                    if [[ ! -f "$DIRMAIN/index/$dep" ]]; then
+                        cp $DIRMAIN/remote/$dep.info "$WORKING_DIR/$dep.info"
+                        echo "COMP_DEP=\"TRUE\"" >>"$WORKING_DIR/$dep.info"
+                        packages=("$dep" "${packages[@]}")
+                    fi
                 done
             fi
         fi
@@ -333,6 +343,11 @@ install_package() {
     echo "VERSION=$VERSION" >>"$DIRMAIN/index/$package"
     echo "SORT=$SORT" >>"$DIRMAIN/index/$package"
     echo "SIZE=$SIZE" >>"$DIRMAIN/index/$package"
+    if [[ "$COMP_DEP" == "true" ]]; then
+        echo "COMP_DEP=\"true\"" >>"$DIRMAIN/index/$package"
+    elif [[ "$DEP" == "true" ]]; then
+        echo "DEP=\"true\"" >>"$DIRMAIN/index/$package"
+    fi
 
     echo -e "${INFO} Cleaning up...\n"
     cd "$WORKING_DIR" || {
@@ -521,6 +536,24 @@ clean_cache() {
     rm -rf "$WORKING_DIR"
 }
 
+clean_comp_deps() {
+    safe_to_del=()
+
+    cd "$DIRMAIN/index/" || {
+        echo -e "failed to change dir"
+        exit 1
+    }
+
+    for info in *; do
+        source "$DIRMAIN/index/$info"
+        if [[ "$COMP_DEP" == "true" ]]; then
+            safe_to_del+=("$info")
+            COMP_DEP=""
+        fi
+    done
+    del_packages "${safe_to_del[@]}"
+}
+
 # This function lists all packages from the remote file in a fancy way
 #
 # Verify that a search term is provided if not return an error
@@ -649,6 +682,7 @@ help_message() {
     echo -e "    bpm upgrade"
     echo -e "    bpm config"
     echo -e "    bpm clean"
+    echo -e "    bpm depclean"
     echo -e "    bpm search  [package]"
     echo -e "    bpm info    [package]"
     echo -e "    bpm list"
