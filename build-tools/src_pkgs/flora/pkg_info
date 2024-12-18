@@ -8,9 +8,11 @@ COMPILE_DEPENDENCIES=()
 DEPENDENCIES=()
 DOWNLOAD="true"
 COMPILE="false"
-ROOT_FOR_INSTALL="true"
+ROOT_FOR_INSTALL="${ROOT_FOR_INSTALL:-true}"
 
-INSTALLED_FILES=(/usr/local/bin/flora)
+prefix="${prefix:-/usr}"
+
+INSTALLED_FILES=($prefix/bin/flora)
 
 DOWNLOAD_SRC() {
     cd $PKG_DIR/src
@@ -18,6 +20,7 @@ DOWNLOAD_SRC() {
 }
 
 INSTALL_PKG() {
+    mkdir -p $prefix/bin/
     chmod +x $PKG_DIR/src/Flora/flora
-    mv $PKG_DIR/src/Flora/flora /usr/local/bin/
+    mv $PKG_DIR/src/Flora/flora $prefix/bin/
 }

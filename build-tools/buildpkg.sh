@@ -33,7 +33,7 @@ case "$1" in
         echo "COMPILE_DEPENDENCIES=(${COMPILE_DEPENDENCIES[@]})" >>"../tmp/$SORT/$i.info"
         echo "DOWNLOAD=\"$DOWNLOAD\"" >>"../tmp/$SORT/$i.info"
         echo "COMPILE=\"$COMPILE\"" >>"../tmp/$SORT/$i.info"
-        echo "ROOT_FOR_INSTALL=\"$ROOT_FOR_INSTALL\"" >>"../tmp/$SORT/$i.info"
+        #echo "ROOT_FOR_INSTALL=\"$ROOT_FOR_INSTALL\"" >>"../tmp/$SORT/$i.info"
         echo "INSTALLED_FILES=(${INSTALLED_FILES[*]})" >>"../tmp/$SORT/$i.info"
 
         md5=($(md5sum "../pkgs/$SORT/$i.tar.gz"))

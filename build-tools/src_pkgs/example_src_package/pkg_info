@@ -8,14 +8,17 @@ COMPILE_DEPENDENCIES=()
 DEPENDENCIES=()
 DOWNLOAD="false"
 COMPILE="true"
-ROOT_FOR_INSTALL="true"
+ROOT_FOR_INSTALL="${ROOT_FOR_INSTALL:-true}"
 
-INSTALLED_FILES=(/usr/local/bin/bpm_example)
+prefix="${prefix:-/usr}"
+
+INSTALLED_FILES=($prefix/bin/bpm_example)
 
 COMPILE_SRC() {
     gcc -o $PKG_DIR/build/bpm_example -O2 $PKG_DIR/src/main.c
 }
 
 INSTALL_PKG() {
-    mv $PKG_DIR/build/bpm_example /usr/local/bin/
+    mkdir -p $prefix/bin
+    mv $PKG_DIR/build/bpm_example $prefix/bin/
 }
