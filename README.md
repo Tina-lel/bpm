@@ -34,7 +34,7 @@ cd bpm/
 
 # Usage
 
-```shell
+```plaintext
 usage:  bpm <operation> [...]
 operations:
     bpm add     [package(s)]
