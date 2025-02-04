@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# Simple tool to build packages for the bpm package manager
+# This tool builds you the packages and structure for hosting a bpm repository
+
+# NEEDS TO BE REWORKED
 
 case "$1" in
 "ALL")

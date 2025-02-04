@@ -31,7 +31,7 @@ export BOLD="\e[1m"
 export ENDCOLOR="\e[0m"
 
 # Info variables
-export SUCCSESS="${GRAY}[${GREEN}✓${GRAY}]${ENDCOLOR}"
+export SUCCESS="${GRAY}[${GREEN}✓${GRAY}]${ENDCOLOR}"
 export ERROR="${RED}Error:${ENDCOLOR}"
 export WARNING="${GRAY}[${RED}!${GRAY}]${ENDCOLOR}"
 export SECTION="${GRAY}[${YELLOW}!${GRAY}]${ENDCOLOR}"
@@ -162,14 +162,24 @@ check_args() {
     esac
 }
 
-# Checks if the first passed argument is empty if not then proceed with the next check
-# Then checks if in a for loop for each package if it is available in the given repo using
-# generic html status codes
-#
-# Asks kindly for consent and displays the amount, names and total net size of the packages
-# that are about to be installed
-#
-# If confirmed passes every package in the array to the install_package function seperatly
+# Checks if any packages are specified as arguments, and if not, exits with an error
+# Sources the remote package info file
+# Initializes local variables to track the sizes of packages and their extraction sizes
+
+# Loops through each specified package and checks if the package is already installed
+# If the package is installed, compares the installed version with the remote version
+# If the version is different, prompts for update; if same, prompts for reinstallation
+
+# Loops through each package and retrieves its info file
+# Accumulates the total download and extracted sizes for all packages
+# Checks if the package has dependencies, adding them to the package list if needed
+# Checks if the package has compile dependencies, adding them to the package list if needed
+
+# Calculates the total number of packages and prints out the details of the packages and their sizes
+# Asks for user confirmation to proceed with installation
+
+# If the user cancels, it removes the info files and exits with a cancellation message
+# Otherwise, proceeds to install each package in the list
 add_packages() {
     if [[ $1 == "" ]]; then
         echo -e "${ERROR} no targets specified."
@@ -249,33 +259,33 @@ add_packages() {
     esac
 }
 
-# Gets the package name from the add_packages() function
-# Checks if the working directory given in the config file is available
-# Then downloads the package.info and package.tar.gz
-# The .info file contains the $SORT variable in which is declared
-# in which sub-repo the tar.gz is located, this can be specified by the maintainer
-# for a more organized repo structure
+# Starts the installation of a package by accepting the package name as an argument
+# Sets the error handling mode to not exit immediately on errors (set +e)
+# Changes the current directory to the working directory
+# If changing the directory fails, it prints an error and exits
 #
-# Checks the last line of the .info file containing the checksum for the tar.gz
-# if nothing has been tampered with the tar.gz file gets extracted
+# Begins downloading the package from a repository using curl
+# If PROGRESS_BAR is enabled, it shows a progress bar during download, otherwise it suppresses the progress
 #
-# Creates a variable for easy path handling for the user user specified build instructions
-# Unique for each package
+# Verifies the integrity of the downloaded package by checking its checksum
+# If the checksum doesn't match, it prints an error and exits
 #
-# Sources the pkg_info file of the package for said instructions
-# the DOWNLOAD_SRC, COMPILE_SRC and INSTALL_SC functions are all inside the pkg_info file
-# which can be a bit confusing but its necessary because not every package is installed the same,
-# so the instructions for installing are all in standardized format inside each package
+# Extracts the downloaded package using tar
+# Sets the PKG_DIR variable to the directory where the package is extracted
 #
-# Checks $ROOT_FOR_INSTALL If the package needs root access to install
-# if yes then pass all previously declared variable to the INSTALL_PKG function and run it as root
-# if not just run the INSTALL_PKG normally
+# Loads build information for the package by sourcing the pkg_info file from the extracted directory
+# Restores error handling mode to exit immediately on errors (set -e)
 #
-# This next part is very important, it copies the array from the pkg_info containing where the package was installed
-# and puts it inside the config bpm/index folder, this keeps track of which and where packages are installed, the array of
-# where the package has to be installed must be delcared by the maintainer
+# If DOWNLOAD is set to true, downloads source code externally using a function called DOWNLOAD_SRC
+# If COMPILE is set to true, compiles the source code using a function called COMPILE_SRC
 #
-# Lastly clears all the downlaoded/compiled files from the working directory because they arent needed anymore
+# Installs the package using either doas or sudo (if ROOT_FOR_INSTALL is true) or directly if not
+# It uses a bash command to install the package with necessary environment variables
+#
+# Writes the installed package details (such as files, dependencies, version, etc.) to the package's index file
+#
+# Cleans up by removing the downloaded tarball, package info file, and extracted directory
+# Changes back to the working directory before cleaning up
 install_package() {
     local package="$1"
     set +e
@@ -357,13 +367,25 @@ install_package() {
     rm -rf "$package.tar.gz" "$package.info" "$package"
 }
 
-# Checks if the first passed argument is empty if not then proceed with the next check
-# Then checks if the package is present in the index, if yes then proceed
+# Starts the process of removing one or more packages passed as arguments
+# Checks if any package names were provided; if not, it prints an error and exits
 #
-# Asks kindly for consent and displays the amount and names of the packages that are about
-# to be removed
+# Initializes local variables: an array to hold the packages, a variable to keep track of total size,
+# and a counter for the number of packages
 #
-# If confirmed passes every package in the array to the remove_package function seperatly
+# Iterates through each package in the provided list:
+# - If the package is not installed (doesn't have an index file), it prints an error and exits
+# - If the package is installed, it sources the package's index to retrieve details
+# - It calculates the total size of the packages to be removed
+#
+# It changes the current directory to the package index location and checks if any other packages depend on
+# the current package being processed, warning the user about dependencies
+#
+# After checking all the packages, it displays a summary of the total size to be removed and prompts the user
+# for confirmation before proceeding with the removal
+#
+# If the user confirms (y or Y), it proceeds to remove each package by calling the remove_package function
+# If the user cancels (any other input), it aborts the process and exits
 del_packages() {
     if [[ $1 == "" ]]; then
         echo -e "${ERROR} no targets specified."
@@ -417,17 +439,17 @@ del_packages() {
     esac
 }
 
-# Gets the package name from the del_packages() function
-# Sources the index file of the package that is about to be removed,
+# Starts the removal of a specified package by accepting the package name as an argument
+# Sources the package's index file to retrieve details about the installed files
 #
-# this file contains the paths in where the package was installed
-# If the array containing said file locations is empty the script will remind you so
+# Checks if there are any installed files for the package; if there are none, it prints an error
 #
-# If the package was installed using root the script needs to elivate its privilages to remove the files
-# If a package needs to be installed using root is defined by the maintainer and kept track of inside the index file
-# but if no root privilages are needed the files just get deleted normally
+# If ROOT_FOR_INSTALL is true, the function attempts to delete the installed files with elevated privileges:
+# - It checks for the presence of either `doas` or `sudo` and uses the appropriate command to remove the files
 #
-# After that the index file for the package gets deleted for the package manager to know that it is not installed anymore
+# If ROOT_FOR_INSTALL is not true, it deletes the files directly without using elevated privileges
+#
+# After deleting the installed files, it removes the package's index from the directory
 remove_package() {
     local package="$1"
     source "$DIRMAIN/index/$package"
@@ -457,9 +479,19 @@ remove_package() {
     rm -rf "$DIRMAIN/index/$package"
 }
 
-# This is quite something.
-# Uses curl to get every .info file from the repo and proccesses the VERSION, SORT and DESCRIPTION
-# and puts them in an array inside the remote file
+# Starts the process of updating the local package list by refreshing remote information
+# Sets the script to exit immediately on errors (set -e)
+#
+# Changes the current directory to the remote directory; if it fails, it prints an error and exits
+# Removes any existing files in the remote directory to prepare for fresh data
+#
+# Iterates through each remote repository and sorting type from the REPO and SORT arrays:
+# - Downloads the remote BPMINFO.tar.gz file from each repository/sort combination
+# - Extracts the tarball content into the directory, stripping leading directory components
+# - Displays a success message once the extraction is complete
+#
+# After refreshing the local remote info, it writes the version, sort, and description details of the packages
+# to a new file called remote_info, formatted in a way that's easy to parse
 update_packagelist() {
     set -e
     echo -e "${INFO} Refreshing local remote info"
@@ -474,7 +506,7 @@ update_packagelist() {
         for remote_sort in "${SORT[@]}"; do
             echo -ne "$remote_repo/$remote_sort... "
             curl --silent --output - "$remote_repo/$remote_sort/BPMINFO.tar.gz" | tar -xzf - --strip-components=1
-            echo -e "${SUCCSESS}"
+            echo -e "${SUCCESS}"
         done
     done
 
@@ -487,7 +519,9 @@ update_packagelist() {
     done >"$DIRMAIN/remote_info"
 }
 
-# Checks if the user as a local packagelist for the specified repo
+# Checks if the remote_info file exists, indicating that the local package list has been updated
+# If the file does not exist, it prints an error message and suggests running the "bpm update" command
+# Exits the script if the remote_info file is missing
 check_packagelist() {
     if [[ ! -f "$DIRMAIN/remote_info" ]]; then
         echo -e "${ERROR} please run \"bpm update\" first"
@@ -495,19 +529,21 @@ check_packagelist() {
     fi
 }
 
-# First checks if there are any occurences inside the index folder of the working
-# directory which stores information about every installed package
-# Then it sources the remote file which contains every package and info about the
-# specified repo
+# Starts the process of upgrading installed packages
+# Checks if there are any packages installed by looking for files in the package index directory
+# If no packages are found, it prints an error and exits
 #
-# Then it processes every pockage each in a for loop with the array inside the index
-# with the array inside the remote
-# The two versions inside the array get compared and if they are not the same, the
-# package name gets added to the packages_to_upgrade array
-# (Couldnt explain this better)
+# Displays a message indicating that it is checking for updates
+# Sources the remote_info file to get the latest version information for remote packages
 #
-# Then the packages_to_upgrade array just passes every name to the add_packages()
-# functions which installs them
+# Initializes arrays to store package information and packages that need upgrading
+#
+# Iterates through the installed packages, comparing the local package version with the remote version:
+# - If the versions do not match, the package is added to the list of packages to upgrade
+# - If the versions match, it skips the package
+#
+# If there are packages to upgrade, it calls the add_packages function to handle the upgrade
+# If no packages need upgrading, it prints a message indicating there's nothing to do
 upgrade_packages() {
     if [[ -z "$(ls -A $DIRMAIN/index/)" ]]; then
         echo -e "${ERROR} No packages installed"
@@ -527,6 +563,8 @@ upgrade_packages() {
         source "$package_info"
         REMOTE_VERSION="${!package}"
         # FIXME: this needs to be rewritten to PACKAGE_VERSION
+        # Because $VERSION already existed and I had to rewrite
+        # The banner code for this to work again >:3
         if [[ "$VERSION" != "$REMOTE_VERSION" ]]; then
             packages_to_upgrade+=("$package")
         else
@@ -541,13 +579,22 @@ upgrade_packages() {
     fi
 }
 
-# Clear the bpm cache in case something went wrong or you just
-# suffer from severe OCD
+# Clears the cache by deleting the working directory
 clean_cache() {
     echo -e "${INFO} Clearing cache..."
     rm -rf "$WORKING_DIR"
 }
 
+# Starts the process of cleaning up unnecessary or unused compilation dependencies
+# Initializes an array to hold the packages that are safe to delete
+#
+# Changes the current directory to the index directory; if it fails, it prints an error and exits
+#
+# Iterates through all the package index files:
+# - Sources each package's index to check if it has the COMP_DEP flag set to true
+# - If COMP_DEP is true, the package is added to the list of packages to be safely deleted and resets COMP_DEP
+#
+# After identifying the packages to delete, it calls the del_packages function to remove them
 clean_comp_deps() {
     safe_to_del=()
 
@@ -566,16 +613,16 @@ clean_comp_deps() {
     del_packages "${safe_to_del[@]}"
 }
 
-# This function lists all packages from the remote file in a fancy way
+# Searches for a package in the remote package list based on a specified search term
+# If no search term is provided, it prints an error and returns
 #
-# Verify that a search term is provided if not return an error
-# Print the last updated timestamp of the remote file
-# Loop through each line in the file ->
-# Skip empty lines
-# Parse the package name, version, repo, and description by splitting the line
-# Remove unnecessary characters (parentheses and quotes)
-# Check if the search term matches the package name or description
-# If a match is found, format and display the details
+# Initializes the search term from the first argument and prints the last updated time of the remote_info file
+#
+# Reads through each line of the remote_info file:
+# - Skips empty lines
+# - Parses the package details (name, version, repository, description) from the line
+# - Matches the search term against the package name or description
+# - If a match is found, it prints the package's repository, name, version, and description
 search_package() {
     if [[ -z "$1" ]]; then
         echo -e "${ERROR} no package specified."
@@ -615,11 +662,12 @@ search_package() {
     done <"$DIRMAIN/remote_info"
 }
 
-# Checks if the first passed argument is empty if not then proceed
-# Checks if the package the user specified exists inside the /info directory of the repo
-# If a file was found proceeds, if not then displays an error message
+# Displays information about a specified package
+# Checks if a package name is provided as an argument; if not, it prints an error and exits
 #
-# Then uses curl to display the contents of the .info file of the given package
+# Verifies if the package's info file exists in the remote directory; if it does not, it prints an error and exits
+#
+# If the package info file exists, it prints the package's information by displaying the contents of the file
 info_package() {
     if [[ $1 == "" ]]; then
         echo -e "${ERROR} no package specified."
@@ -636,14 +684,15 @@ info_package() {
     cat "$DIRMAIN/remote/$package.info"
 }
 
-# List all packages provided by the update_packagelist() function
-# inside the remote folder of the working directory
+# Displays the last updated timestamp for the remote package list, based on the modification time of the remote_info file
 #
-# Loop through each line in the file ->
-# Skip empty lines
-# Parse the package name, version, repo, and description by splitting the line
-# Remove unnecessary characters (parentheses and quotes)
-# Format and display the parsed details
+# Reads the remote_info file line by line to extract and display information about each package
+# For each line, it:
+# - Skips empty lines
+# - Parses the package name, version, repository, and description by splitting and trimming the content
+# - Strips away unnecessary parentheses and quotes
+#
+# For each package, it prints the repository, package name, version, and description in a formatted manner
 info_packagelist() {
     echo -e "${INFO} Last updated on $(date -r $DIRMAIN/remote_info "+%Y-%m-%d / %H:%M:%S\n")"
 
