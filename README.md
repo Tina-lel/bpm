@@ -57,15 +57,15 @@ operations:
 
 ## Frontend
 
-- [X] File Checksums
-- [X] Full Tool Arguments
-- [X] Local packages list
-- [X] ~/.config/bpm.conf for various stuff
-- [X] Search by package name and description
-- [X] Update function with new version display
-- [X] Installed, Upgraded, Removed Packages net size
+- [x] File Checksums
+- [x] Full Tool Arguments
+- [x] Local packages list
+- [x] ~/.config/bpm.conf for various stuff
+- [x] Search by package name and description
+- [x] Update function with new version display
+- [x] Installed, Upgraded, Removed Packages net size
 - [ ] x86 64bit, 32bit and arm support
 
 ## Backend
 
-- [X] Package builder script with checksum generation
+- [x] Package builder script with checksum generation
