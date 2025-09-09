@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #===============================================================================
 # bpm - A Bash-based System Package Manager
 # Authors: Tina-lel and Justus0405
@@ -152,11 +152,11 @@ check_args() {
         version_message
         ;;
     "")
-        echo -e "${ERROR} no operation specified. Use $0 help"
+        echo -e "${ERROR} no operation specified. Use $(basename "$0") help"
         exit 1
         ;;
     *)
-        echo -e "${ERROR} unrecognized option '$1'. Use $0 help"
+        echo -e "${ERROR} unrecognized option '$1'. Use $(basename "$0") help"
         exit 1
         ;;
     esac
@@ -735,7 +735,7 @@ info_index() {
 
 # Try not to change me every 10 commits challange (Impossible)
 help_message() {
-    echo -e "usage: $0 <operation> [...]"
+    echo -e "usage: $(basename "$0") <operation> [...]"
     echo -e "operations:"
     echo -e "    bpm add     [package(s)]"
     echo -e "    bpm del     [package(s)]"
