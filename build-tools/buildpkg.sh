@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This tool builds you the packages and structure for hosting a bpm repository
 
