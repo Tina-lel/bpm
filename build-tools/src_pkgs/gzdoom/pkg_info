@@ -1,0 +1,33 @@
+# Package info (GZDoom)
+# UNFINISHED; DO NOT USE
+DESCRIPTION="GZDoom is a feature centric port for all Doom engine games."
+VERSION="git"
+
+SORT="extra"
+
+COMPILE_DEPENDENCIES=()
+DEPENDENCIES=()
+DOWNLOAD="true"
+COMPILE="true"
+ROOT_FOR_INSTALL="${ROOT_FOR_INSTALL:-false}"
+
+PREFIX="${PREFIX:-$HOME/bpm}"
+
+INSTALLED_FILES=()
+
+DOWNLOAD_SRC() {
+    cd $PKG_DIR/src
+    git clone https://github.com/ZDoom/gzdoom.git
+}
+
+COMPILE_SRC() {
+    cd $PKG_DIR/src/gzdoom
+    mkdir build && cd build
+    cmake .. -DCMAKE_BUILD_TYPE=Release
+    make $MAKEFLAGS
+}
+
+INSTALL_PKG() {
+    mkdir -p $PREFIX/bin
+    mv $PKG_DIR/src/gzdoom/build/ $PREFIX/bin/
+}

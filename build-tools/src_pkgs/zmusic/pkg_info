@@ -23,7 +23,7 @@ COMPILE_SRC() {
     cd $PKG_DIR/src/zmusic
     mkdir build && cd build
     cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PREFIX
-    make
+    make $MAKEFLAGS
 }
 
 INSTALL_PKG() {
