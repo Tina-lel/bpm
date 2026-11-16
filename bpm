@@ -52,6 +52,7 @@ create_conf() {
         echo "REPO=(\"\")" >>"$DIRMAIN/bpm.conf"
         echo "SORT=(\"\")" >>"$DIRMAIN/bpm.conf"
         echo "WORKING_DIR=\"$HOME/.cache/bpm\"" >>"$DIRMAIN/bpm.conf"
+        echo "PREFIX=\"$HOME/bpm\"" >>"$DIRMAIN/bpm.conf"
         echo "PROGRESS_BAR=\"true\"" >>"$DIRMAIN/bpm.conf"
         echo "" >>"$DIRMAIN/bpm.conf"
         echo "COMMON_FLAGS=\"-g -O3 -march=native -pipe\"" >>"$DIRMAIN/bpm.conf"
