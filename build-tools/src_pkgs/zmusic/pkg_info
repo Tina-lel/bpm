@@ -1,0 +1,35 @@
+# Package info (ZMusic)
+DESCRIPTION="ZMusic for ZDoom"
+VERSION="git"
+
+SORT="extra"
+
+COMPILE_DEPENDENCIES=()
+DEPENDENCIES=()
+DOWNLOAD="true"
+COMPILE="true"
+ROOT_FOR_INSTALL="${ROOT_FOR_INSTALL:-false}"
+
+PREFIX="${PREFIX:-$HOME/bpm}"
+
+INSTALLED_FILES=($PREFIX/lib/libzmusiclite.so.1.3.0 $PREFIX/lib/libzmusic.so.1.3.0 $PREFIX/lib/libzmusiclite.so $PREFIX/lib/libzmusic.so)
+
+DOWNLOAD_SRC() {
+    cd $PKG_DIR/src
+    git clone https://github.com/ZDoom/ZMusic.git zmusic
+}
+
+COMPILE_SRC() {
+    cd $PKG_DIR/src/zmusic
+    mkdir build && cd build
+    cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PREFIX
+    make
+}
+
+INSTALL_PKG() {
+    mkdir -p $PREFIX/lib/
+    mv $PKG_DIR/src/zmusic/build/source/libzmusiclite.so.1.3.0 $PREFIX/lib/
+    mv $PKG_DIR/src/zmusic/build/source/libzmusic.so.1.3.0 $PREFIX/lib/
+    ln -s libzmusiclite.so.1.3.0 $PREFIX/lib/libzmusiclite.so
+    ln -s libzmusic.so.1.3.0 $PREFIX/lib/libzmusic.so
+}
