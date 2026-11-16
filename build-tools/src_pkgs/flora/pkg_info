@@ -8,9 +8,9 @@ COMPILE_DEPENDENCIES=()
 DEPENDENCIES=()
 DOWNLOAD="true"
 COMPILE="false"
-ROOT_FOR_INSTALL="${ROOT_FOR_INSTALL:-true}"
+ROOT_FOR_INSTALL="${ROOT_FOR_INSTALL:-false}"
 
-prefix="${prefix:-/usr}"
+prefix="${prefix:-$HOME/bpm}"
 
 INSTALLED_FILES=($prefix/bin/flora)
 
