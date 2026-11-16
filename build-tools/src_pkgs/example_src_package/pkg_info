@@ -10,15 +10,15 @@ DOWNLOAD="false"
 COMPILE="true"
 ROOT_FOR_INSTALL="${ROOT_FOR_INSTALL:-false}"
 
-prefix="${prefix:-$HOME/bpm}"
+PREFIX="${PREFIX:-$HOME/bpm}"
 
-INSTALLED_FILES=($prefix/bin/bpm_example)
+INSTALLED_FILES=($PREFIX/bin/bpm_example)
 
 COMPILE_SRC() {
     gcc -o $PKG_DIR/build/bpm_example -O2 $PKG_DIR/src/main.c
 }
 
 INSTALL_PKG() {
-    mkdir -p $prefix/bin
-    mv $PKG_DIR/build/bpm_example $prefix/bin/
+    mkdir -p $PREFIX/bin
+    mv $PKG_DIR/build/bpm_example $PREFIX/bin/
 }

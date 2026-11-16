@@ -10,9 +10,9 @@ DOWNLOAD="true"
 COMPILE="false"
 ROOT_FOR_INSTALL="${ROOT_FOR_INSTALL:-false}"
 
-prefix="${prefix:-$HOME/bpm}"
+PREFIX="${PREFIX:-$HOME/bpm}"
 
-INSTALLED_FILES=($prefix/bin/flora)
+INSTALLED_FILES=($PREFIX/bin/flora)
 
 DOWNLOAD_SRC() {
     cd $PKG_DIR/src
@@ -20,7 +20,7 @@ DOWNLOAD_SRC() {
 }
 
 INSTALL_PKG() {
-    mkdir -p $prefix/bin/
+    mkdir -p $PREFIX/bin/
     chmod +x $PKG_DIR/src/Flora/flora
-    mv $PKG_DIR/src/Flora/flora $prefix/bin/
+    mv $PKG_DIR/src/Flora/flora $PREFIX/bin/
 }
