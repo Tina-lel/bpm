@@ -1,5 +1,4 @@
 # Package info (GZDoom)
-# UNFINISHED; DO NOT USE
 DESCRIPTION="GZDoom is a feature centric port for all Doom engine games."
 VERSION="git"
 
@@ -13,7 +12,20 @@ ROOT_FOR_INSTALL="${ROOT_FOR_INSTALL:-false}"
 
 PREFIX="${PREFIX:-$HOME/bpm}"
 
-INSTALLED_FILES=()
+INSTALLED_FILES=(\
+    $PREFIX/bin/gzdoom\
+    $PREFIX/include/dap\
+    $PREFIX/lib64/cmake\
+    $PREFIX/lib64/libcppdap.a\
+    $PREFIX/libzmusic.so\
+    $PREFIX/libzmusic.so.1\
+    $PREFIX/libzmusic.so.1.3.0\
+    $PREFIX/share/applications/org.zdoom.GZDoom.desktop\
+    $PREFIX/share/doc/gzdoom\
+    $PREFIX/share/games/doom\
+    $PREFIX/share/icons/hicolor/scalable/apps/org.zdoom.GZDoom.svg\
+    $PREFIX/share/metainfo/org.zdoom.GZDoom.metainfo.xml\
+    $PREFIX/share/mime/packages/org.zdoom.GZDoom-mime.xml)
 
 DOWNLOAD_SRC() {
     cd $PKG_DIR/src
@@ -23,11 +35,10 @@ DOWNLOAD_SRC() {
 COMPILE_SRC() {
     cd $PKG_DIR/src/gzdoom
     mkdir build && cd build
-    cmake .. -DCMAKE_BUILD_TYPE=Release
+    cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PREFIX
     make $MAKEFLAGS
 }
 
 INSTALL_PKG() {
-    mkdir -p $PREFIX/bin
-    mv $PKG_DIR/src/gzdoom/build/ $PREFIX/bin/
+    make install
 }
