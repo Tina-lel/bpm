@@ -298,10 +298,16 @@ install_package() {
 
     echo -e "${INFO} Downloading package..."
     source "$package.info" >/dev/null 2>&1
-    if [[ "$PROGRESS_BAR" == "true" ]]; then
-        curl --progress-bar -o "$package.tar.gz" "$REPO/$SORT/$package.tar.gz"
+
+    # Has to be reworked. Doesnt account for $REPO being an array, just uses first entry.
+    if [[ -d "$REPO" ]]; then
+        cp "$REPO/$SORT/$package.tar.gz" .
     else
-        curl -s -o "$package.tar.gz" "$REPO/$SORT/$package.tar.gz"
+        if [[ "$PROGRESS_BAR" == "true" ]]; then
+            curl --progress-bar -o "$package.tar.gz" "$REPO/$SORT/$package.tar.gz"
+        else
+            curl -s -o "$package.tar.gz" "$REPO/$SORT/$package.tar.gz"
+        fi
     fi
 
     # Dont forget to install coreutils for your beloved alpine Tina :3
