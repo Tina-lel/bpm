@@ -187,6 +187,13 @@ add_packages() {
         exit 1
     fi
 
+    # This checks if the user explicitly wants to install a package as root
+    # Otherwise this just gets overwritten by the packages .info file
+    if [[ "$ROOT_FOR_INSTALL" == "true" ]]; then
+        echo -e "${WARNING} INSTALLING AS ROOT"
+        override_ROOT_FOR_INSTALL="true"
+    fi
+
     source "$DIRMAIN/remote_info"
 
     local packages=("$@")
@@ -341,7 +348,7 @@ install_package() {
     fi
 
     echo -e "${INFO} Installing package..."
-    if [[ "$ROOT_FOR_INSTALL" == "true" ]]; then
+    if [[ "$ROOT_FOR_INSTALL" == "true" || "$override_ROOT_FOR_INSTALL" == "true" ]]; then
         # this might be a security vulnurability, but its better than before xd
         if command -v doas 2>&1 >/dev/null; then
             doas bash -c "$(declare); INSTALL_PKG" 2>/dev/null
