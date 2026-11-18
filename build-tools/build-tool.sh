@@ -33,6 +33,9 @@ check_args() {
         "all")
             build_all
             ;;
+        "clean")
+            clean_all
+            ;;
         "help")
             help_message
             ;;
@@ -143,10 +146,19 @@ build_all() {
     echo -e "\e[1A\e[2K${SUCCESS} Writing bpminfo"
 }
 
+clean_all() {
+    echo -e "${INFO} Deleting pkg folder"
+    rm -rf pkgs
+    echo -e "${INFO} Deleting tmp folder"
+    rm -rf tmp
+    exit 0
+}
+
 help_message() {
     echo -e "usage: $(basename "$0") <operation>"
     echo -e "operations:"
     echo -e "   build-tool.sh all"
+    echo -e "   build-tool.sh clean"
     echo -e "   build-tool.sh help"
     echo -e "   build-tool.sh version"
 }
