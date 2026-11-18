@@ -23,6 +23,9 @@ A ~fully functioning~ package manager for linux written in bash
 > [!NOTE]
 > This is work in progress,
 > proceed with caution.
+>
+> #### AI Disclaimer
+> No generative AI of ANY KIND was used to write this program.
 
 # Installation
 
