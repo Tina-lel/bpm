@@ -97,7 +97,7 @@ pkg_info() {
     echo "COMPILE_DEPENDENCIES=(${COMPILE_DEPENDENCIES[@]})" >>"$BUILD_TOOL_PATH/tmp/$SORT/$1.info"
     echo "DOWNLOAD=\"$DOWNLOAD\"" >>"$BUILD_TOOL_PATH/tmp/$SORT/$1.info"
     echo "COMPILE=\"$COMPILE\"" >>"$BUILD_TOOL_PATH/tmp/$SORT/$1.info"
-    #echo "INSTALLED_FILES=(${INSTALLED_FILES[*]})" >>"$BUILD_TOOL_PATH/tmp/$SORT/$1.info"
+    #echo "INSTALLED_FILES=(${INSTALLED_FILES[@]})" >>"$BUILD_TOOL_PATH/tmp/$SORT/$1.info"
 
     md5=($(md5sum "$BUILD_TOOL_PATH/pkgs/$SORT/$1.tar.gz"))
     echo "$md5  $1.tar.gz" >>"$BUILD_TOOL_PATH/tmp/$SORT/$1.info"
@@ -147,7 +147,8 @@ pkg_compile() {
 
     grep "ROOT_FOR_INSTALL=\"" "$BUILD_TOOL_PATH/src_pkgs/$1/pkg_info" >>"$WORKING_DIR/src_pkgs-bin/${1}_bin/pkg_info"
     grep "PREFIX=\"" "$BUILD_TOOL_PATH/src_pkgs/$1/pkg_info" >>"$WORKING_DIR/src_pkgs-bin/${1}_bin/pkg_info"
-    grep "INSTALLED_FILES=(" "$BUILD_TOOL_PATH/src_pkgs/$1/pkg_info" >>"$WORKING_DIR/src_pkgs-bin/${1}_bin/pkg_info"
+
+    echo "INSTALLED_FILES=(${INSTALLED_FILES[@]})" >>"$WORKING_DIR/src_pkgs-bin/${1}_bin/pkg_info"
 
     echo -e "INSTALL_PKG() {\n    mv \$PKG_DIR/build/* \$PREFIX/\n}" >>"$WORKING_DIR/src_pkgs-bin/${1}_bin/pkg_info"
 }

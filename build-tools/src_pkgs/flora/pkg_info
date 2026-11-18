@@ -12,7 +12,7 @@ ROOT_FOR_INSTALL="${ROOT_FOR_INSTALL:-false}"
 
 PREFIX="${PREFIX:-$HOME/bpm}"
 
-INSTALLED_FILES=($PREFIX/bin/flora)
+INSTALLED_FILES=('$PREFIX/bin/flora')
 
 DOWNLOAD_SRC() {
     cd $PKG_DIR/src

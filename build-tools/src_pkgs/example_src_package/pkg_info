@@ -12,7 +12,7 @@ ROOT_FOR_INSTALL="${ROOT_FOR_INSTALL:-false}"
 
 PREFIX="${PREFIX:-$HOME/bpm}"
 
-INSTALLED_FILES=($PREFIX/bin/bpm_example)
+INSTALLED_FILES=('$PREFIX/bin/bpm_example')
 
 COMPILE_SRC() {
     gcc -o $PKG_DIR/build/bpm_example -O2 $PKG_DIR/src/main.c
