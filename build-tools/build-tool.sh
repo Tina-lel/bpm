@@ -17,6 +17,17 @@ export ERROR="${RED}Error:${ENDCOLOR}"
 export WARNING="${GRAY}[${RED}!${GRAY}]${ENDCOLOR}"
 export INFO="${GRAY}[${CYAN}i${GRAY}]${ENDCOLOR}"
 
+# Compiling variables
+# TODO: seperate config
+WORKING_DIR="workingdir"
+
+COMMON_FLAGS="-g -O3 -pipe"
+CFLAGS="${COMMON_FLAGS}"
+CPPFLAGS="${COMMON_FLAGS}"
+CXXFLAGS="${COMMON_FLAGS}"
+MAKEFLAGS="-j$(nproc)"
+RUSTFLAGS="--release -j $(nproc)"
+
 set -e
 
 # Functions
@@ -31,7 +42,8 @@ dir_check() {
 check_args() {
     case "$1" in
         "all")
-            build_all
+            shift
+            build_all "$@"
             ;;
         "clean")
             clean_all
@@ -94,7 +106,28 @@ pkg_bpminfo() {
     tar -czf "../pkgs/$1/BPMINFO.tar.gz" $1/*
 }
 
+pkg_compilecheck() {
+    source "$1/pkg_info"
+    if [[ "$COMPILE" == "true" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 build_all() {
+    case "$1" in
+        "--build-binaries")
+            echo -e "${WARNING} Compiling Packages\n"
+            build_binaries="true"
+            ;;
+        "")
+            ;;
+        *)
+            echo -e "${ERROR} '$1' not understood."
+            exit 1
+            ;;
+    esac
     echo -e "${INFO} Building all packages\n"
     mkdir -p "pkgs"
     mkdir -p "tmp"
@@ -113,6 +146,23 @@ build_all() {
         counter="$(( $counter + 1 ))"
     done
     echo -e "\e[1A\e[2K${SUCCESS} Checking validity\n"
+
+    if [[ "$build_binaries" == "true" ]]; then
+
+        compile_array=()
+
+        counter="1"
+        for package in *; do
+            echo -e "\e[1A\e[2K${INFO} Checking if $package needs to be compiled... [$counter/$package_ammount]"
+            if pkg_compilecheck "$package"; then
+                compile_array+=("$package")
+            fi
+            counter="$(( $counter + 1 ))"
+        done
+        echo -e "\e[1A\e[2K${SUCCESS} Compile Check"
+        echo -e "${INFO} Packages to compile: ${compile_array[@]}\n"
+
+    fi
 
     counter="1"
     for package in *; do
@@ -157,7 +207,7 @@ clean_all() {
 help_message() {
     echo -e "usage: $(basename "$0") <operation>"
     echo -e "operations:"
-    echo -e "   build-tool.sh all"
+    echo -e "   build-tool.sh all [--build-binaries]"
     echo -e "   build-tool.sh clean"
     echo -e "   build-tool.sh help"
     echo -e "   build-tool.sh version"
