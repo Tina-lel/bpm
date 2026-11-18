@@ -30,9 +30,9 @@ check_args() {
         "")
             echo -e "${ERROR} no operation specified. Use $(basename "$0") help"
             exit 1
-        	;;
+            ;;
         *)
-      	    echo -e "${ERROR} unrecognized option '$1'. Use $(basename "$0") help"
+            echo -e "${ERROR} unrecognized option '$1'. Use $(basename "$0") help"
             exit 1
             ;;
     esac
