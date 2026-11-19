@@ -1,0 +1,50 @@
+# Package info (ioquake3)
+DESCRIPTION="The ioquake3 community effort to continue supporting/developing id's Quake III Arena"
+VERSION="git"
+
+SORT="extra"
+
+COMPILE_DEPENDENCIES=()
+DEPENDENCIES=()
+DOWNLOAD="true"
+COMPILE="true"
+ROOT_FOR_INSTALL="${ROOT_FOR_INSTALL:-false}"
+
+PREFIX="${PREFIX:-$HOME/bpm}"
+
+INSTALLED_FILES=(\
+    '$PREFIX/opt/ioq3/ioquake3'\
+    '$PREFIX/opt/ioq3/renderer_opengl1.so'\
+    '$PREFIX/opt/ioq3/renderer_opengl2.so'\
+    '$PREFIX/opt/ioq3/baseq3/cgame.so'\
+    '$PREFIX/opt/ioq3/baseq3/qagame.so'\
+    '$PREFIX/opt/ioq3/baseq3/ui.so'\
+    '$PREFIX/opt/ioq3/baseq3/vm/cgame.qvm'\
+    '$PREFIX/opt/ioq3/baseq3/vm/qagame.qvm'\
+    '$PREFIX/opt/ioq3/baseq3/vm/ui.qvm'\
+    '$PREFIX/opt/ioq3/baseq3/vm'\
+    '$PREFIX/opt/ioq3/missionpack/cgame.so'\
+    '$PREFIX/opt/ioq3/missionpack/qagame.so'\
+    '$PREFIX/opt/ioq3/missionpack/ui.so'\
+    '$PREFIX/opt/ioq3/missionpack/vm/cgame.qvm'\
+    '$PREFIX/opt/ioq3/missionpack/vm/qagame.qvm'\
+    '$PREFIX/opt/ioq3/missionpack/vm/ui.qvm'\
+    '$PREFIX/opt/ioq3/missionpack/vm'\
+    '$PREFIX/bin/ioquake3')
+
+DOWNLOAD_SRC() {
+    cd $PKG_DIR/src
+    git clone https://github.com/ioquake/ioq3
+}
+
+COMPILE_SRC() {
+    cd $PKG_DIR/src/ioq3
+    cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PREFIX/opt/ioq3 -D BUILD_SERVER=0
+    cmake --build build $MAKEFLAGS
+}
+
+INSTALL_PKG() {
+    cmake --install build
+    echo -e "#"'!'"/usr/bin/env bash\ncd $PREFIX/opt/ioq3\n./ioquake3" > $PREFIX/bin/ioquake3
+    chmod +x $PREFIX/bin/ioquake3
+}
