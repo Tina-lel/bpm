@@ -521,14 +521,20 @@ update_packagelist() {
         if [[ -d "$remote_repo" ]]; then
             for remote_sort in "${SORT[@]}"; do
                 echo -ne "$remote_repo/$remote_sort... "
-                tar -xzf "$remote_repo/$remote_sort/BPMINFO.tar.gz" --strip-components=1
-                echo -e "${SUCCESS}"
+                if tar -xzf "$remote_repo/$remote_sort/BPMINFO.tar.gz" --strip-components=1; then
+                    echo -e "${SUCCESS}"
+                else
+                    echo -e "${WARNING} Sort $remote_sort not found"
+                fi
             done
         else
             for remote_sort in "${SORT[@]}"; do
                 echo -ne "$remote_repo/$remote_sort... "
-                curl --silent --output - "$remote_repo/$remote_sort/BPMINFO.tar.gz" | tar -xzf - --strip-components=1
-                echo -e "${SUCCESS}"
+                if curl --silent --output - "$remote_repo/$remote_sort/BPMINFO.tar.gz" | tar -xzf - --strip-components=1; then
+                    echo -e "${SUCCESS}"
+                else
+                    echo -e "${WARNING} Sort $remote_sort not found"
+                fi
             done
         fi
     done
