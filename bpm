@@ -144,7 +144,8 @@ check_args() {
         info_packagelist
         ;;
     "index")
-        info_index
+        shift
+        info_index "$1"
         ;;
     "help")
         help_message
@@ -746,13 +747,23 @@ info_packagelist() {
     done <"$DIRMAIN/remote_info"
 }
 
-# List all the folders in a list inside the index folder
-# of the working directory of bpm to keep track of where packages
-# are installed, check your bpm config file
-# to see the current working directory
+# List all the files in a list inside the index folder,
+# to show wich packages are currently installed.
+# Optionally supports an input to show installation information
+# for a specific package. (files, version, dependenceis, etc)
 info_index() {
-    echo -e "${INFO} Listing installed Packages\n"
-    ls -1 "$DIRMAIN/index"
+    if [[ $1 == "" ]]; then
+        echo -e "${INFO} Listing installed Packages\n"
+        ls -1 "$DIRMAIN/index"
+    else
+        if [[ -f "$DIRMAIN/index/$1" ]]; then
+            echo -e "${INFO} Index info for $1"
+            cat "$DIRMAIN/index/$1"
+        else
+            echo -e "${ERROR} Cant get index info for $1"
+            exit 1
+        fi
+    fi
 }
 
 # Try not to change me every 10 commits challange (Impossible)
@@ -769,7 +780,7 @@ help_message() {
     echo -e "    bpm search  [package]"
     echo -e "    bpm info    [package]"
     echo -e "    bpm list"
-    echo -e "    bpm index"
+    echo -e "    bpm index   (package)"
     echo -e "    bpm help"
     echo -e "    bpm version"
     echo -e ""
