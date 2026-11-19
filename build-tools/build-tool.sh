@@ -150,7 +150,7 @@ pkg_compile() {
 
     echo "INSTALLED_FILES=(${INSTALLED_FILES[@]})" >>"$WORKING_DIR/src_pkgs-bin/${1}_bin/pkg_info"
 
-    echo -e "INSTALL_PKG() {\n    mv \$PKG_DIR/build/* \$PREFIX/\n}" >>"$WORKING_DIR/src_pkgs-bin/${1}_bin/pkg_info"
+    echo -e "INSTALL_PKG() {\n    cp -fr \$PKG_DIR/build/* \$PREFIX/\n}" >>"$WORKING_DIR/src_pkgs-bin/${1}_bin/pkg_info"
 }
 
 build_all() {
