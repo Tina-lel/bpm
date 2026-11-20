@@ -1,6 +1,7 @@
 # Package info (Example Package v1)
 DESCRIPTION="Example package for BPM"
 VERSION="1.0"
+MAINTAINER="Tina_lel <tina_lel@protonmail.com>"
 
 SORT="main"
 

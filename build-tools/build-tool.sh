@@ -91,6 +91,7 @@ pkg_info() {
 
     echo "DESCRIPTION=\"$DESCRIPTION\"" >"$BUILD_TOOL_PATH/tmp/$SORT/$1.info"
     echo "VERSION=\"$VERSION\"" >>"$BUILD_TOOL_PATH/tmp/$SORT/$1.info"
+    echo "MAINTAINER=\"$MAINTAINER\"" >>"$BUILD_TOOL_PATH/tmp/$SORT/$1.info"
     echo "SORT=\"$SORT\"" >>"$BUILD_TOOL_PATH/tmp/$SORT/$1.info"
     echo "SIZE=\"$(du --apparent-size -hs --bytes $BUILD_TOOL_PATH/pkgs/$SORT/$1.tar.gz | cut -f1)\"" >>"$BUILD_TOOL_PATH/tmp/$SORT/$1.info"
     echo "SIZE_EXTRACT=\"$(du --apparent-size -hs --bytes $1 | cut -f1)\"" >>"$BUILD_TOOL_PATH/tmp/$SORT/$1.info"

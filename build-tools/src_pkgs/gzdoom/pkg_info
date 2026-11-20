@@ -1,6 +1,7 @@
 # Package info (GZDoom)
 DESCRIPTION="GZDoom is a feature centric port for all Doom engine games."
 VERSION="git"
+MAINTAINER="Tina_lel <tina_lel@protonmail.com>"
 
 SORT="extra"
 

@@ -1,6 +1,7 @@
 # Package info (ioquake3)
 DESCRIPTION="The ioquake3 community effort to continue supporting/developing id's Quake III Arena"
 VERSION="git"
+MAINTAINER="Tina_lel <tina_lel@protonmail.com>"
 
 SORT="extra"
 

@@ -1,6 +1,7 @@
 # Package info (Flora git)
 DESCRIPTION="End to end encrypted chat room"
 VERSION="git"
+MAINTAINER="Tina_lel <tina_lel@protonmail.com>"
 
 SORT="extra"
 
