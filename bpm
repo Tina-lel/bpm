@@ -252,20 +252,27 @@ add_packages() {
     echo -e "Total Download Size:  $(numfmt --to=iec $packages_size)"
     echo -e "Total Extracted Size: $(numfmt --to=iec $packages_size_final)"
     echo -e ""
-    read -rp "Proceed with installation? [Y/n] " confirm
-    case "$confirm" in
-    [nN])
-        rm -f $WORKING_DIR/*.info
-        echo -e "${RED}Aborted.${ENDCOLOR}"
-        exit 0
-        ;;
-    *)
-        for package_inst in "${packages[@]}"; do
-            echo -e "${SECTION} Installing $package_inst"
-            install_package "$package_inst"
-        done
-        ;;
-    esac
+    while :; do
+        read -rp "Proceed with installation? [Y/n] " confirm
+        case "$confirm" in
+        [nN])
+            rm -f $WORKING_DIR/*.info
+            echo -e "${RED}Aborted.${ENDCOLOR}"
+            exit 0
+            ;;
+        [yY] | "")
+            for package_inst in "${packages[@]}"; do
+                echo -e "${SECTION} Installing $package_inst"
+                install_package "$package_inst"
+            done
+            ;;
+        *)
+            echo -e "${WARNING} '$confirm' not understood."
+            continue
+            ;;
+        esac
+        break
+    done
 }
 
 # Starts the installation of a package by accepting the package name as an argument
@@ -439,19 +446,26 @@ del_packages() {
     echo -e ""
     echo -e "Total Removed Size: -$(numfmt --to=iec $packages_size)"
     echo -e ""
-    read -rp "Proceed with removal? [y/N] " confirm
-    case "$confirm" in
-    [yY])
-        for package_del in "${packages[@]}"; do
-            echo -e "${SECTION} Removing $package_del"
-            remove_package "$package_del"
-        done
-        ;;
-    *)
-        echo -e "${RED}Aborted.${ENDCOLOR}"
-        exit 0
-        ;;
-    esac
+    while :; do
+        read -rp "Proceed with removal? [y/N] " confirm
+        case "$confirm" in
+        [nN] | "")
+            echo -e "${RED}Aborted.${ENDCOLOR}"
+            exit 0
+            ;;
+        [yY])
+            for package_del in "${packages[@]}"; do
+                echo -e "${SECTION} Removing $package_del"
+                remove_package "$package_del"
+            done
+            ;;
+        *)
+            echo -e "${WARNING} '$confirm' not understood."
+            continue
+            ;;
+        esac
+    break
+    done
 }
 
 # Starts the removal of a specified package by accepting the package name as an argument
