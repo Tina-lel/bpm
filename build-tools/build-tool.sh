@@ -47,7 +47,8 @@ check_args() {
             build_all "$@"
             ;;
         "clean")
-            clean_all
+            shift
+            clean "$@"
             ;;
         "help")
             help_message
@@ -269,9 +270,19 @@ build_all() {
     echo -e "\e[1A\e[2K${SUCCESS} Writing bpminfo"
 }
 
-clean_all() {
-    echo -e "${INFO} Deleting pkg folder"
-    rm -rf pkgs
+clean() {
+    case "$1" in
+        "--all")
+            echo -e "${INFO} Deleting pkg folder"
+            rm -rf pkgs
+            ;;
+    	"")
+            ;;
+	    *)
+            echo -e "${ERROR} '$1' not understood."
+            exit 1
+            ;;
+    esac
     echo -e "${INFO} Deleting tmp folder"
     rm -rf tmp
     echo -e "${INFO} Deleting workingdir folder"
@@ -283,7 +294,7 @@ help_message() {
     echo -e "usage: $(basename "$0") <operation>"
     echo -e "operations:"
     echo -e "   build-tool.sh all [--build-binaries]"
-    echo -e "   build-tool.sh clean"
+    echo -e "   build-tool.sh clean [--all]"
     echo -e "   build-tool.sh help"
     echo -e "   build-tool.sh version"
 }
