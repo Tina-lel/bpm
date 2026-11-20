@@ -137,7 +137,7 @@ pkg_compile() {
 
     echo "# Package info (${1}_bin)" >"$WORKING_DIR/src_pkgs-bin/${1}_bin/pkg_info"
     echo "# Compiled by build-tool on $(date +%Y-%m-%d\ %H:%m)" >>"$WORKING_DIR/src_pkgs-bin/${1}_bin/pkg_info"
-    echo "DESCRIPTION=\"$DESCRIPTION (Binary)\"" >>"$WORKING_DIR/src_pkgs-bin/${1}_bin/pkg_info"
+    echo "DESCRIPTION=\"$DESCRIPTION [Binary]\"" >>"$WORKING_DIR/src_pkgs-bin/${1}_bin/pkg_info"
     echo "VERSION=\"${VERSION}-bin\"" >>"$WORKING_DIR/src_pkgs-bin/${1}_bin/pkg_info"
     echo "SORT=\"bin\"" >>"$WORKING_DIR/src_pkgs-bin/${1}_bin/pkg_info"
     echo "COMPILE_DEPENDENCIES=()" >>"$WORKING_DIR/src_pkgs-bin/${1}_bin/pkg_info"
