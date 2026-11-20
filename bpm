@@ -699,7 +699,7 @@ search_package() {
 
         # Check if the search term matches the package name or description
         if [[ "$package_name" =~ $search_term || "$description" =~ $search_term ]]; then
-            echo -e "${repo}/${package_name} ${version}"
+            echo -e "${GREEN}${repo}${ENDCOLOR}/${CYAN}${package_name}${ENDCOLOR} ${GRAY}${version}${ENDCOLOR}"
             echo -e "    ${description}"
         fi
     done <"$DIRMAIN/remote_info"
@@ -761,7 +761,7 @@ info_packagelist() {
         IFS='"' read -r _ version _ repo _ description _ <<<"$content"
 
         # Print the formatted output
-        echo -e "${repo}/${package_name} ${version}"
+        echo -e "${GREEN}${repo}${ENDCOLOR}/${CYAN}${package_name}${ENDCOLOR} ${GRAY}${version}${ENDCOLOR}"
         echo -e "    ${description}"
 
     done <"$DIRMAIN/remote_info"
