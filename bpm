@@ -55,7 +55,7 @@ create_conf() {
         echo "PREFIX=\"$HOME/bpm\"" >>"$DIRMAIN/bpm.conf"
         echo "PROGRESS_BAR=\"true\"" >>"$DIRMAIN/bpm.conf"
         echo "" >>"$DIRMAIN/bpm.conf"
-        echo "COMMON_FLAGS=\"-g -O3 -march=native -pipe\"" >>"$DIRMAIN/bpm.conf"
+        echo "COMMON_FLAGS=\"-O3 -march=native -pipe\"" >>"$DIRMAIN/bpm.conf"
         echo "CFLAGS=\"\${COMMON_FLAGS}\"" >>"$DIRMAIN/bpm.conf"
         echo "CPPFLAGS=\"\${COMMON_FLAGS}\"" >>"$DIRMAIN/bpm.conf"
         echo "CXXFLAGS=\"\${COMMON_FLAGS}\"" >>"$DIRMAIN/bpm.conf"
