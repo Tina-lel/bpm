@@ -276,7 +276,7 @@ clean() {
             echo -e "${INFO} Deleting pkg folder"
             rm -rf pkgs
             ;;
-    	"")
+        "")
             ;;
 	    *)
             echo -e "${ERROR} '$1' not understood."
