@@ -1,0 +1,35 @@
+# Package info (ioquake3_ded)
+DESCRIPTION="The ioquake3 community effort to continue supporting/developing id's Quake III Arena (Dedicated Server)"
+VERSION="git"
+
+SORT="extra"
+
+COMPILE_DEPENDENCIES=()
+DEPENDENCIES=()
+DOWNLOAD="true"
+COMPILE="true"
+ROOT_FOR_INSTALL="${ROOT_FOR_INSTALL:-false}"
+
+PREFIX="${PREFIX:-$HOME/bpm}"
+
+INSTALLED_FILES=(\
+    '$PREFIX/opt/ioq3/ioq3ded'\
+    '$PREFIX/bin/ioquake3-ded')
+
+DOWNLOAD_SRC() {
+    cd $PKG_DIR/src
+    git clone https://github.com/ioquake/ioq3
+}
+
+COMPILE_SRC() {
+    cd $PKG_DIR/src/ioq3
+    cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PREFIX/opt/ioq3 -D BUILD_SERVER=1 -D BUILD_CLIENT=0 -D BUILD_GAME_LIBRARIES=0 -D BUILD_GAME_QVMS=0
+    cmake --build build $MAKEFLAGS
+}
+
+INSTALL_PKG() {
+    cmake --install build
+    mkdir -p $PREFIX/bin
+    echo -e "#"'!'"/usr/bin/env bash\ncd $PREFIX/opt/ioq3\n./ioq3ded" > $PREFIX/bin/ioquake3-ded
+    chmod +x $PREFIX/bin/ioquake3-ded
+}
