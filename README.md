@@ -3,10 +3,10 @@
 <p align="center">
     <!-- Version Badge -->
     <a href="https://github.com/Tina-lel/bpm/blob/stable/bpm"><img src="https://img.shields.io/badge/Version-0.1-blue?colorA=283037&colorB=ffffff&style=for-the-badge"></a>
-    <!-- Forks Badge -->
-    <a href="https://github.com/Tina-lel/bpm/forks"><img src="https://img.shields.io/github/forks/Tina-lel/bpm?colorA=283037&colorB=ffffff&style=for-the-badge"></a>
     <!-- Stars Badge -->
     <a href="https://github.com/Tina-lel/bpm/stargazers"><img src="https://img.shields.io/github/stars/Tina-lel/bpm?colorA=283037&colorB=ffffff&style=for-the-badge"></a>
+    <!-- Forks Badge -->
+    <a href="https://github.com/Tina-lel/bpm/forks"><img src="https://img.shields.io/github/forks/Tina-lel/bpm?colorA=283037&colorB=ffffff&style=for-the-badge"></a>
     <!-- Last Commit Badge -->
     <a href="https://github.com/Tina-lel/bpm/commits/main/"><img src="https://img.shields.io/github/last-commit/Tina-lel/bpm?logo=github&logoColor=ffffff&colorA=283037&colorB=ffffff&style=for-the-badge"></a>
 </p>
