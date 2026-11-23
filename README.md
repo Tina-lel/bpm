@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-A <s>fully functioning</s> package manager for linux written in bash
+A <s>fully functioning</s> package manager for GNU/Linux written in bash
 </p>
 
 > [!IMPORTANT]
