@@ -32,7 +32,7 @@ gzip
 ```shell
 git clone --depth 1 https://github.com/Tina-lel/bpm.git
 cd bpm/
- ./install.sh
+./install.sh
 ```
 
 ## Usage

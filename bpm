@@ -464,7 +464,7 @@ del_packages() {
             continue
             ;;
         esac
-    break
+        break
     done
 }
 

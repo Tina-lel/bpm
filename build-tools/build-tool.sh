@@ -42,28 +42,28 @@ dir_check() {
 
 check_args() {
     case "$1" in
-        "all")
-            shift
-            build_all "$@"
-            ;;
-        "clean")
-            shift
-            clean "$@"
-            ;;
-        "help")
-            help_message
-            ;;
-        "version")
-            version_message
-            ;;
-        "")
-            echo -e "${ERROR} no operation specified. Use $(basename "$0") help"
-            exit 1
-            ;;
-        *)
-            echo -e "${ERROR} unrecognized option '$1'. Use $(basename "$0") help"
-            exit 1
-            ;;
+    "all")
+        shift
+        build_all "$@"
+        ;;
+    "clean")
+        shift
+        clean "$@"
+        ;;
+    "help")
+        help_message
+        ;;
+    "version")
+        version_message
+        ;;
+    "")
+        echo -e "${ERROR} no operation specified. Use $(basename "$0") help"
+        exit 1
+        ;;
+    *)
+        echo -e "${ERROR} unrecognized option '$1'. Use $(basename "$0") help"
+        exit 1
+        ;;
     esac
 }
 
@@ -157,16 +157,16 @@ pkg_compile() {
 
 build_all() {
     case "$1" in
-        "--build-binaries")
-            echo -e "${WARNING} Compiling Packages\n"
-            build_binaries="true"
-            ;;
-        "")
-            ;;
-        *)
-            echo -e "${ERROR} '$1' not understood."
-            exit 1
-            ;;
+    "--build-binaries")
+        echo -e "${WARNING} Compiling Packages\n"
+        build_binaries="true"
+        ;;
+    "")
+        ;;
+    *)
+        echo -e "${ERROR} '$1' not understood."
+        exit 1
+        ;;
     esac
     echo -e "${INFO} Building all packages\n"
     mkdir -p "pkgs"
@@ -183,7 +183,7 @@ build_all() {
     for package in *; do
         echo -e "\e[1A\e[2K${INFO} Checking validity of $package... [$counter/$package_ammount]"
         pkg_validity_check "$package"
-        counter="$(( $counter + 1 ))"
+        counter="$(($counter + 1))"
     done
     echo -e "\e[1A\e[2K${SUCCESS} Checking validity\n"
 
@@ -201,7 +201,7 @@ build_all() {
             if pkg_compilecheck "$package"; then
                 compile_array+=("$package")
             fi
-            counter="$(( $counter + 1 ))"
+            counter="$(($counter + 1))"
         done
         echo -e "\e[1A\e[2K${SUCCESS} Compile Check"
         echo -e "${INFO} Packages to compile: ${compile_array[@]}\n"
@@ -215,7 +215,7 @@ build_all() {
         for package in "${compile_array[@]}"; do
             echo -e "\e[1A\e[2K${INFO} Compiling $package... [$counter/${#compile_array[@]}]"
             pkg_compile "$package"
-            counter="$(( $counter + 1 ))"
+            counter="$(($counter + 1))"
         done
         echo -e "\e[1A\e[2K${SUCCESS} Compiling\n"
 
@@ -231,7 +231,7 @@ build_all() {
         for package in *; do
             echo -e "\e[1A\e[2K${INFO} Compressing $package... [$counter/$package_ammount]"
             pkg_build "$package"
-            counter="$(( $counter + 1 ))"
+            counter="$(($counter + 1))"
         done
         echo -e "\e[1A\e[2K${SUCCESS} Compressing\n"
 
@@ -239,7 +239,7 @@ build_all() {
         for package in *; do
             echo -e "\e[1A\e[2K${INFO} Writing info for $package... [$counter/$package_ammount]"
             pkg_info "$package"
-            counter="$(( $counter + 1 ))"
+            counter="$(($counter + 1))"
         done
         echo -e "\e[1A\e[2K${SUCCESS} Writing info\n"
 
@@ -266,23 +266,23 @@ build_all() {
     for sort in *; do
         echo -e "\e[1A\e[2K${INFO} Writing bpminfo for $sort... [$counter/$sort_ammount]"
         pkg_bpminfo "$sort"
-        counter="$(( $counter + 1 ))"
+        counter="$(($counter + 1))"
     done
     echo -e "\e[1A\e[2K${SUCCESS} Writing bpminfo"
 }
 
 clean() {
     case "$1" in
-        "--all")
-            echo -e "${INFO} Deleting pkg folder"
-            rm -rf pkgs
-            ;;
-        "")
-            ;;
-	    *)
-            echo -e "${ERROR} '$1' not understood."
-            exit 1
-            ;;
+    "--all")
+        echo -e "${INFO} Deleting pkg folder"
+        rm -rf pkgs
+        ;;
+    "")
+        ;;
+    *)
+        echo -e "${ERROR} '$1' not understood."
+        exit 1
+        ;;
     esac
     echo -e "${INFO} Deleting tmp folder"
     rm -rf tmp
@@ -304,7 +304,7 @@ version_message() {
     echo -e ""
     echo -e "───▄▄▄         bpm build-tool.sh v$BUILDTOOL_VERSION - bash 5.2.37"
     echo -e "─▄▀░▄░▀▄       Copyright (C) 2024-present Tina-lel"
-	echo -e "─█░█▄▀░█       Copyright (C) 2024-present Justus0405"
+    echo -e "─█░█▄▀░█       Copyright (C) 2024-present Justus0405"
     echo -e "─█░▀▄▄▀█▄█▄▀"
     echo -e "▄▄█▄▄▄▄███▀    This program may be freely redistributed under"
     echo -e "               the terms of the GNU General Public License v2.0"
