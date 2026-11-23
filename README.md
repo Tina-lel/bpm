@@ -1,41 +1,41 @@
-# Bash Package Manager
+<img width="2500" height="1000" alt="bpm_logo" src="https://github.com/user-attachments/assets/bc5919a8-1aba-488f-b27f-b5e998a17858" /><br>
 
-<p align="left">
-    <!-- Stars Badge -->
-	<a href="https://github.com/Tina-lel/bpm/stargazers"><img src="https://img.shields.io/github/stars/Tina-lel/bpm?colorA=1e1e2e&colorB=b7bdf8&style=for-the-badge"></a>
-    <!-- Issues Badge -->
-	<a href="https://github.com/Tina-lel/bpm/issues"><img src="https://img.shields.io/github/issues/Tina-lel/bpm?colorA=1e1e2e&colorB=f5a97f&style=for-the-badge"></a>
-    <!-- Contributors Badge -->
-	<a href="https://github.com/Tina-lel/bpm/contributors"><img src="https://img.shields.io/github/contributors/Tina-lel/bpm?colorA=1e1e2e&colorB=a6da95&style=for-the-badge"></a>
-</p>
-
-<p align="left">
-    <!-- License Badge -->
-    <a href="https://github.com/Tina-lel/bpm/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Tina-lel/bpm?logo=Github&colorA=1e1e2e&colorB=cba6f7&style=for-the-badge"></a>
+<p align="center">
     <!-- Version Badge -->
-    <a href="https://github.com/Tina-lel/bpm/blob/main/bpm"><img src="https://img.shields.io/badge/Version-0.1-blue?colorA=1e1e2e&colorB=cdd6f4&style=for-the-badge"></a>
+    <a href="https://github.com/Tina-lel/bpm/blob/stable/bpm"><img src="https://img.shields.io/badge/Version-0.1-blue?colorA=283037&colorB=ffffff&style=for-the-badge"></a>
+    <!-- Forks Badge -->
+    <a href="https://github.com/Tina-lel/bpm/forks"><img src="https://img.shields.io/github/forks/Tina-lel/bpm?colorA=283037&colorB=ffffff&style=for-the-badge"></a>
+    <!-- Stars Badge -->
+    <a href="https://github.com/Tina-lel/bpm/stargazers"><img src="https://img.shields.io/github/stars/Tina-lel/bpm?colorA=283037&colorB=ffffff&style=for-the-badge"></a>
+    <!-- Last Commit Badge -->
+    <a href="https://github.com/Tina-lel/bpm/commits/main/"><img src="https://img.shields.io/github/last-commit/Tina-lel/bpm?logo=github&logoColor=ffffff&colorA=283037&colorB=ffffff&style=for-the-badge"></a>
 </p>
 
-A ~fully functioning~ package manager for linux written in bash
+<p align="center">
+A <s>fully functioning</s> package manager for linux written in bash
+</p>
 
-# Information
+> [!IMPORTANT]
+> No generative AI of ANY KIND was used for this project!
 
-> [!NOTE]
-> This is work in progress,
-> proceed with caution.
->
-> #### AI Disclaimer
-> No generative AI of ANY KIND was used to write this program.
+## Dependencies
 
-# Installation
+```plaintext
+bash
+curl
+tar
+gzip
+```
+
+## Installation
 
 ```shell
-git clone https://github.com/Tina-lel/bpm
+git clone --depth 1 https://github.com/Tina-lel/bpm.git
 cd bpm/
  ./install.sh
 ```
 
-# Usage
+## Usage
 
 ```plaintext
 usage: bpm <operation> [...]
@@ -45,30 +45,23 @@ operations:
     bpm update
     bpm upgrade
     bpm config
+    bpm clean
+    bpm depclean
     bpm search  [package]
     bpm info    [package]
     bpm list
-    bpm index
-    bpm clean
-    bpm depclean
+    bpm index   (package)
     bpm help
     bpm version
 
 ```
 
-# Todo
+#
 
-## Frontend
+<p align="center">
+	Copyright &copy; 2024-present <a href="https://github.com/Tina-lel" target="_blank">Tina-lel</a> and <a href="https://github.com/Justus0405" target="_blank">Justus0405</a>
+</p>
 
-- [x] File Checksums
-- [x] Full Tool Arguments
-- [x] Local packages list
-- [x] ~/.config/bpm.conf for various stuff
-- [x] Search by package name and description
-- [x] Update function with new version display
-- [x] Installed, Upgraded, Removed Packages net size
-- [ ] x86 64bit, 32bit and arm support
-
-## Backend
-
-- [x] Package builder script with checksum generation
+<p align="center">
+	<a href="https://github.com/Tina-lel/bpm/blob/stable/LICENSE"><img src="https://img.shields.io/github/license/Tina-lel/bpm?logo=Github&colorA=283037&colorB=ffffff&style=for-the-badge"></a>
+</p>
