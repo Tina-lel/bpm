@@ -1,4 +1,4 @@
-<img width="2500" height="1000" alt="bpm_logo" src="https://github.com/user-attachments/assets/bc5919a8-1aba-488f-b27f-b5e998a17858" /><br>
+<img width="2500" height="1000" alt="bpm_logo" src="https://github.com/user-attachments/assets/58c75bb8-e884-4ad0-bef3-43a264c24f15" /><br>
 
 <p align="center">
     <!-- Version Badge -->
