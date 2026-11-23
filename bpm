@@ -328,7 +328,7 @@ install_package() {
     # Dont forget to install coreutils for your beloved alpine Tina :3
     # yea i fukin did
     echo -e "${INFO} Verifying checksum..."
-    cat "$package.info" | tail -n 1 | md5sum --quiet -c - || {
+    cat "$package.info" | tail -n 1 | sha256sum --quiet -c - || {
         echo -e "${ERROR} Checksum missmatch"
         exit 1
     }

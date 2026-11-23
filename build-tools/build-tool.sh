@@ -101,8 +101,8 @@ pkg_info() {
     echo "COMPILE=\"$COMPILE\"" >>"$BUILD_TOOL_PATH/tmp/$SORT/$1.info"
     #echo "INSTALLED_FILES=(${INSTALLED_FILES[@]})" >>"$BUILD_TOOL_PATH/tmp/$SORT/$1.info"
 
-    md5=($(md5sum "$BUILD_TOOL_PATH/pkgs/$SORT/$1.tar.gz"))
-    echo "$md5  $1.tar.gz" >>"$BUILD_TOOL_PATH/tmp/$SORT/$1.info"
+    sha256=($(sha256sum "$BUILD_TOOL_PATH/pkgs/$SORT/$1.tar.gz"))
+    echo "$sha256  $1.tar.gz" >>"$BUILD_TOOL_PATH/tmp/$SORT/$1.info"
 }
 
 pkg_bpminfo() {
