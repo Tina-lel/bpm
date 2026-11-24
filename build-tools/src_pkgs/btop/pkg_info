@@ -1,0 +1,39 @@
+# Package info (btop++)
+DESCRIPTION="A monitor of resources"
+VERSION="1.4.8"
+MAINTAINER="Tina_lel <tina_lel@protonmail.com>"
+
+SORT="main"
+
+COMPILE_DEPENDENCIES=()
+DEPENDENCIES=()
+DOWNLOAD="true"
+COMPILE="true"
+ROOT_FOR_INSTALL="${ROOT_FOR_INSTALL:-false}"
+
+PREFIX="${PREFIX:-$HOME/bpm}"
+
+INSTALLED_FILES=(\
+    '$PREFIX/bin/btop'\
+    '$PREFIX/share/btop'\
+    '$PREFIX/share/doc/btop'\
+    '$PREFIX/share/applications/btop.desktop'\
+    '$PREFIX/share/icons/hicolor/48x48/apps/btop.png'\
+    '$PREFIX/share/icons/hicolor/scalable/apps/btop.svg'\
+    '$PREFIX/share/man/man1/btop.1')
+
+
+DOWNLOAD_SRC() {
+    cd $PKG_DIR/src/
+    wget -O btop.tar.gz https://github.com/aristocratos/btop/archive/refs/tags/v1.4.8.tar.gz
+    tar -xzf btop.tar.gz --strip-components=1
+}
+
+COMPILE_SRC() {
+    cd $PKG_DIR/src/
+    CXXFLAGS="$CXXFLAGS" make $MAKEFLAGS
+}
+
+INSTALL_PKG() {
+    PREFIX="$PREFIX" make install
+}
