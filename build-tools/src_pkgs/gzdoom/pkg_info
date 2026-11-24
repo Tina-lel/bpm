@@ -30,7 +30,7 @@ INSTALLED_FILES=(\
 
 DOWNLOAD_SRC() {
     cd $PKG_DIR/src
-    git clone https://github.com/ZDoom/gzdoom.git
+    git clone --depth 1 https://github.com/ZDoom/gzdoom.git
 }
 
 COMPILE_SRC() {

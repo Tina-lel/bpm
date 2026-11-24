@@ -17,7 +17,7 @@ INSTALLED_FILES=('$PREFIX/bin/flora')
 
 DOWNLOAD_SRC() {
     cd $PKG_DIR/src
-    git clone https://github.com/Tina-lel/Flora
+    git clone --depth 1 https://github.com/Tina-lel/Flora
 }
 
 INSTALL_PKG() {
