@@ -148,7 +148,7 @@ pkg_compile() {
     echo "COMPILE=\"false\"" >>"$WORKING_DIR/src_pkgs-bin/${1}_bin/pkg_info"
 
     grep "ROOT_FOR_INSTALL=\"" "$BUILD_TOOL_PATH/src_pkgs/$1/pkg_info" >>"$WORKING_DIR/src_pkgs-bin/${1}_bin/pkg_info"
-    grep "PREFIX=\"" "$BUILD_TOOL_PATH/src_pkgs/$1/pkg_info" >>"$WORKING_DIR/src_pkgs-bin/${1}_bin/pkg_info"
+    grep "PREFIX=\"" "$BUILD_TOOL_PATH/src_pkgs/$1/pkg_info" | head -n 1 >>"$WORKING_DIR/src_pkgs-bin/${1}_bin/pkg_info"
 
     echo "INSTALLED_FILES=(${INSTALLED_FILES[@]})" >>"$WORKING_DIR/src_pkgs-bin/${1}_bin/pkg_info"
 
