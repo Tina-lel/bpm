@@ -308,6 +308,8 @@ clean() {
     "--compile-cache")
         echo -e "${INFO} Deleting workingdir/cache folder"
         rm -rf "workingdir/cache"
+        echo -e "${INFO} Deleting workingdir/usr folder"
+        rm -rf "workingdir/usr"
         ;;
     "")
         echo -e "${INFO} Deleting tmp folder"
