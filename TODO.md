@@ -2,3 +2,4 @@
 
 - Add support for different architectures [x86 64bit, 32bit, ARM, etc.]
 - Seperate build-tools and BPM into two different repositories
+- Self sustained dependency handling
