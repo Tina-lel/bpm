@@ -223,7 +223,7 @@ build_all() {
                     fi
                 done
             done
-            echo -e "\e[1A\e[2K${WARNING} Skipping compilation of: ${compile_skip[@]}"
+            echo -e "\n\e[1A\e[2K${WARNING} Skipping compilation of: ${compile_skip[@]}"
         fi
 
         cd "$WORKING_DIR/cache" || {
