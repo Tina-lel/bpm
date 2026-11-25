@@ -1,0 +1,54 @@
+# Package info (nmap)
+DESCRIPTION="Network exploration tool and security / port scanner"
+VERSION="7.993"
+MAINTAINER="Tina_lel <tina_lel@protonmail.com>"
+
+SORT="main"
+
+COMPILE_DEPENDENCIES=()
+DEPENDENCIES=()
+DOWNLOAD="true"
+COMPILE="true"
+ROOT_FOR_INSTALL="${ROOT_FOR_INSTALL:-false}"
+
+PREFIX="${PREFIX:-$HOME/bpm}"
+
+INSTALLED_FILES=(\
+    '$PREFIX/bin/ncat'\
+    '$PREFIX/bin/nmap'\
+    '$PREFIX/bin/nping'\
+    '$PREFIX/share/ncat'\
+    '$PREFIX/share/nmap'\
+    '$PREFIX/share/man/man1/nmap.1'\
+    '$PREFIX/share/man/man1/ncat.1'\
+    '$PREFIX/share/man/man1/nping.1'\
+    '$PREFIX/share/man/de/man1/nmap.1'\
+    '$PREFIX/share/man/es/man1/nmap.1'\
+    '$PREFIX/share/man/fr/man1/nmap.1'\
+    '$PREFIX/share/man/hr/man1/nmap.1'\
+    '$PREFIX/share/man/hu/man1/nmap.1'\
+    '$PREFIX/share/man/it/man1/nmap.1'\
+    '$PREFIX/share/man/ja/man1/nmap.1'\
+    '$PREFIX/share/man/pl/man1/nmap.1'\
+    '$PREFIX/share/man/pt_BR/man1/nmap.1'\
+    '$PREFIX/share/man/pt_PT/man1/nmap.1'\
+    '$PREFIX/share/man/ro/man1/nmap.1'\
+    '$PREFIX/share/man/ru/man1/nmap.1'\
+    '$PREFIX/share/man/sk/man1/nmap.1'\
+    '$PREFIX/share/man/zh/man1/nmap.1')
+
+DOWNLOAD_SRC() {
+    cd $PKG_DIR/src/
+    wget -O nmap.tar.gz https://nmap.org/dist/nmap-7.993.tgz
+    tar -xzf nmap.tar.gz --strip-components=1
+}
+
+COMPILE_SRC() {
+    cd $PKG_DIR/src/
+    CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" ./configure --without-zenmap --prefix="$PREFIX"
+    make "$MAKEFLAGS"
+}
+
+INSTALL_PKG() {
+    make install
+}
