@@ -226,11 +226,14 @@ build_all() {
             echo -e "\n\e[1A\e[2K${WARNING} Skipping compilation of: ${compile_skip[@]}"
         fi
 
+        if [[ "${#compile_array[@]}" != "0" ]]; then
+            echo -e "${INFO} Packages to compile: ${compile_array[@]}\n"
+        fi
+
         cd "$WORKING_DIR/cache" || {
             echo -e "${ERROR} could not enter temp path"
             exit 1
         }
-        echo -e "${INFO} Packages to compile: ${compile_array[@]}\n"
 
         counter="1"
         for package in "${compile_array[@]}"; do
