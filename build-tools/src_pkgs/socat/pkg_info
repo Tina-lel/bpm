@@ -13,7 +13,7 @@ ROOT_FOR_INSTALL="${ROOT_FOR_INSTALL:-false}"
 
 PREFIX="${PREFIX:-$HOME/bpm}"
 
-INSTALLED_FILES=($PREFIX/bin/socat)
+INSTALLED_FILES=('$PREFIX/bin/socat')
 
 DOWNLOAD_SRC() {
     cd $PKG_DIR/src/
