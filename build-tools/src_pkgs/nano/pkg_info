@@ -1,0 +1,83 @@
+# Package info (nano)
+DESCRIPTION="GNU GPL'd Pico clone with more functionality"
+VERSION="9.3"
+MAINTAINER="Tina_lel <tina_lel@protonmail.com>"
+
+SORT="main"
+
+COMPILE_DEPENDENCIES=()
+DEPENDENCIES=()
+DOWNLOAD="true"
+COMPILE="true"
+ROOT_FOR_INSTALL="${ROOT_FOR_INSTALL:-false}"
+
+PREFIX="${PREFIX:-$HOME/bpm}"
+
+INSTALLED_FILES=(\
+    '$PREFIX/bin/nano'\
+    '$PREFIX/bin/rnano'\
+    '$PREFIX/share/nano'\
+    '$PREFIX/share/doc/nano'\
+    '$PREFIX/share/info/dir'\
+    '$PREFIX/share/info/nano.info'\
+    '$PREFIX/share/man/man1/nano.1'\
+    '$PREFIX/share/man/man1/rnano.1'\
+    '$PREFIX/share/man/man5/nanorc.5'\
+    '$PREFIX/share/doc/nano'\
+    '$PREFIX/share/locale/ar/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/bg/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/ca/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/cs/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/da/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/de/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/eo/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/es/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/eu/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/fi/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/fr/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/ga/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/gl/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/hr/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/hu/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/id/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/is/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/it/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/ja/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/ka/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/kk/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/ko/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/lv/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/ms/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/nb/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/nl/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/pl/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/pt/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/pt_BR/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/ro/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/ru/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/sk/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/sl/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/sq/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/sr/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/sv/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/tr/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/uk/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/vi/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/zh_CN/LC_MESSAGES/nano.mo'\
+    '$PREFIX/share/locale/zh_TW/LC_MESSAGES/nano.mo')
+
+DOWNLOAD_SRC() {
+    cd $PKG_DIR/src/
+    wget -O nano.tar.gz https://www.nano-editor.org/dist/v9/nano-9.3.tar.gz
+    tar -xzf nano.tar.gz --strip-components=1
+}
+
+COMPILE_SRC() {
+    cd $PKG_DIR/src/
+    CFLAGS="$CFLAGS" ./configure --prefix="$PREFIX"
+    make "$MAKEFLAGS"
+}
+
+INSTALL_PKG() {
+    make install
+}
