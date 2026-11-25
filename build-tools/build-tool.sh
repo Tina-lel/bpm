@@ -22,7 +22,7 @@ export INFO="${GRAY}[${CYAN}i${GRAY}]${ENDCOLOR}"
 # TODO: seperate config
 WORKING_DIR="$BUILD_TOOL_PATH/workingdir"
 
-COMMON_FLAGS="-g -O3 -pipe"
+COMMON_FLAGS="-O3 -pipe"
 CFLAGS="${COMMON_FLAGS}"
 CPPFLAGS="${COMMON_FLAGS}"
 CXXFLAGS="${COMMON_FLAGS}"
@@ -204,12 +204,33 @@ build_all() {
             counter="$(($counter + 1))"
         done
         echo -e "\e[1A\e[2K${SUCCESS} Compile Check"
-        echo -e "${INFO} Packages to compile: ${compile_array[@]}\n"
+
+        # Check if some Packages have already been compiled, and skip them.
+        # So that you dont have to start compiling big repositories from the beginning
+        # if one package makes an oopsie woopsie
+        if [[ ! -z "$( ls -A $WORKING_DIR/src_pkgs-bin)" ]]; then
+            cd "$WORKING_DIR/src_pkgs-bin" || {
+                echo -e "${ERROR} could not enter temp path"
+                exit 1
+            }
+
+            compile_skip=(*)
+            for del in "${compile_skip[@]}"; do
+                del_trim="${del::-4}"
+                for element in "${!compile_array[@]}"; do
+                    if [[ "${compile_array[element]}" = "$del_trim" ]]; then
+                        unset 'compile_array[element]'
+                    fi
+                done
+            done
+            echo -e "\e[1A\e[2K${WARNING} Skipping compilation of: ${compile_skip[@]}"
+        fi
 
         cd "$WORKING_DIR/cache" || {
             echo -e "${ERROR} could not enter temp path"
             exit 1
         }
+        echo -e "${INFO} Packages to compile: ${compile_array[@]}\n"
 
         counter="1"
         for package in "${compile_array[@]}"; do
@@ -275,19 +296,25 @@ clean() {
     case "$1" in
     "--all")
         echo -e "${INFO} Deleting pkg folder"
-        rm -rf pkgs
+        rm -rf "pkgs"
+        echo -e "${INFO} Deleting tmp folder"
+        rm -rf "tmp"
+        echo -e "${INFO} Deleting workingdir folder"
+        rm -rf "workingdir"
+        ;;
+    "--compile-cache")
+        echo -e "${INFO} Deleting workingdir/cache folder"
+        rm -rf "workingdir/cache"
         ;;
     "")
+        echo -e "${INFO} Deleting tmp folder"
+        rm -rf "tmp"
         ;;
     *)
         echo -e "${ERROR} '$1' not understood."
         exit 1
         ;;
     esac
-    echo -e "${INFO} Deleting tmp folder"
-    rm -rf tmp
-    echo -e "${INFO} Deleting workingdir folder"
-    rm -rf workingdir
     exit 0
 }
 
@@ -295,7 +322,7 @@ help_message() {
     echo -e "usage: $(basename "$0") <operation>"
     echo -e "operations:"
     echo -e "   build-tool.sh all [--build-binaries]"
-    echo -e "   build-tool.sh clean [--all]"
+    echo -e "   build-tool.sh clean [--all] [--compile-cache]"
     echo -e "   build-tool.sh help"
     echo -e "   build-tool.sh version"
 }
