@@ -215,11 +215,7 @@ add_packages() {
 
     for package_check in "${packages[@]}"; do
 
-        cp $DIRMAIN/remote/$package_check.info "$WORKING_DIR/$package_check.info" >/dev/null 2>&1
-        if [[ "$?" != 0 ]]; then
-            echo -e "${ERROR} Cant get package info for $package_check"
-            exit 1
-        else
+        if cp $DIRMAIN/remote/$package_check.info "$WORKING_DIR/$package_check.info" >/dev/null 2>&1; then
             source "$WORKING_DIR/$package_check.info" >/dev/null 2>&1
             packages_size=$(("$packages_size" + "$SIZE"))
             packages_size_final=$(("$packages_size_final" + "$SIZE_EXTRACT"))
@@ -241,6 +237,9 @@ add_packages() {
                     fi
                 done
             fi
+        else
+            echo -e "${ERROR} Cant get package info for $package_check"
+            exit 1
         fi
     done
 
